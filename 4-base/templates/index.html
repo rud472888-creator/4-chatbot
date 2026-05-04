@@ -3,120 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ bot.name }} - 캐릭터 챗봇</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap"
-      rel="stylesheet"
-    />
+    <title>Project Ariadne - Who am I?</title>
     <link
       href="{{ url_for('static', filename='css/style.css') }}"
       rel="stylesheet"
     />
     <style>
+      @font-face {
+        font-family: 'DXTaja';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/DXTaja.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
       body {
         margin: 0;
         padding: 0;
-        font-family: "IBM Plex Sans KR", sans-serif;
+        font-family: 'DXTaja', 'Courier New', monospace;
+        background-color: #050814;
+        color: #d4d4d4;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-      .container {
-        max-width: 600px;
-        width: 90%;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         overflow: hidden;
       }
-      .header {
-        padding: 30px;
+      .container {
+        max-width: 800px;
+        width: 90%;
         text-align: center;
-      }
-      .header h1 {
-        margin: 0 0 10px 0;
-        font-size: 2rem;
-        color: #333;
-      }
-      .header p {
-        margin: 0;
-        color: #666;
-        font-size: 0.9rem;
-      }
-      .card {
         padding: 40px;
-        text-align: center;
+        border: 1px solid #1a2235;
+        background: rgba(10, 15, 30, 0.8);
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
       }
-      .card img {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 50%;
+      .title {
+        font-size: 2.5rem;
+        color: #ff3333;
         margin-bottom: 20px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
       }
-      .card h2 {
-        margin: 10px 0;
-        font-size: 1.8rem;
-        color: #333;
-      }
-      .tags {
-        margin: 15px 0;
-      }
-      .tag {
-        display: inline-block;
-        background: #e0e0e0;
-        color: #555;
-        padding: 6px 12px;
-        border-radius: 15px;
-        margin: 4px;
-        font-size: 0.9rem;
-      }
-      .description {
-        margin: 20px 0;
-        color: #666;
-        line-height: 1.6;
+      .intro-text {
+        font-size: 1.2rem;
+        line-height: 2;
+        margin-bottom: 40px;
+        text-align: left;
+        word-break: keep-all;
       }
       .start-btn {
         display: inline-block;
-        margin-top: 20px;
-        padding: 15px 40px;
-        color: white;
-        background: #764ba2;
+        padding: 15px 50px;
+        color: #050814;
+        background: #ff3333;
         text-decoration: none;
-        border-radius: 25px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 5px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
       }
       .start-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      }
-      .footer {
-        padding: 20px;
-        text-align: center;
-        background: #f7f7f7;
-        color: #999;
-        font-size: 0.85rem;
+        background: #ff6666;
+        box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+        transform: scale(1.05);
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <h1>모든 스타일 자유롭게 바꾸시면 됩니다.</h1>
+      <h1 class="title">PROJECT ARIADNE</h1>
+      <div class="intro-text">
+        당신은 우주 한가운데에 있습니다.<br>
+        그러나 기억이 아무것도 나지 않습니다. 이름도, 이곳에 온 이유도, 함께 있던 사람들의 얼굴도 떠오르지 않습니다.<br><br>
+        다만 한 가지는 분명합니다.<br>
+        집으로 돌아가야 합니다. 그 집조차 기억이 나지 않지만요.
       </div>
-      <div class="card" style="flex-direction: column; align-items: center">
-        <img
-          src="./static/images/hateslop/logo_black_genai.png"
-          alt="{{ bot.name }}"
-        />
-        <a href="{{ url_for('detail') }}" class="start-btn">시작하기</a>
-      </div>
+      <a href="{{ url_for('detail') }}" class="start-btn">시스템 접속</a>
     </div>
   </body>
 </html>

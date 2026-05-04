@@ -1,187 +1,321 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ bot.name }} - 상세 정보</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap"
-      rel="stylesheet"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bot.name }} - 통신 연결</title>
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "IBM Plex Sans KR", sans-serif;
-        background: rgba(0, 0, 0, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
-      .modal-container {
-        max-width: 500px;
-        width: 90%;
-        margin: 20px auto;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      }
-      .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        @font-face {
+            font-family: 'DXTaja';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/DXTaja.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        padding: 15px 20px;
-      }
-      .modal-header h2 {
-        margin: 0;
-        flex: 1;
-        text-align: center;
-        font-size: 1.5rem;
-        color: #333;
-      }
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #666;
-      }
-      .modal-content {
-        padding: 30px;
-      }
-      .bot-image {
-        width: 100%;
-        max-width: 300px;
-        height: auto;
-        border-radius: 12px;
-        display: block;
-        margin: 0 auto 20px;
-      }
-      .bot-info {
-        text-align: center;
-      }
-      .bot-info h1 {
-        margin: 0 0 15px 0;
-        font-size: 2rem;
-        color: #333;
-      }
-      .bot-info p {
-        margin: 15px 0;
-        font-size: 1rem;
-        color: #666;
-        line-height: 1.6;
-      }
-      .tags {
-        margin: 15px 0;
-      }
-      .tag {
-        display: inline-block;
-        background: #e0e0e0;
-        color: #555;
-        padding: 6px 12px;
-        border-radius: 15px;
-        margin: 4px;
-        font-size: 0.9rem;
-      }
-      .username-area {
-        margin: 20px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-      }
-      .username-area label {
-        font-size: 1rem;
-        color: #333;
-      }
-      .username-area input {
-        padding: 8px 12px;
-        font-size: 1rem;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        width: 50%;
-        transition: border 0.2s;
-      }
-      .username-area input:focus {
-        outline: none;
-        border-color: #764ba2;
-      }
-      .start-chat {
-        display: block;
-        margin: 20px 0;
-        padding: 12px 20px;
-        background: #764ba2;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.2s;
-      }
-      .start-chat:hover {
-        transform: translateY(-2px);
-      }
+        body {
+            /* 우주선 배경 이미지 */
+            background-image: url("{{ url_for('static', filename='images/spaceship_bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-color: #050814;
+            font-family: 'Pretendard', 'IBM Plex Sans KR', sans-serif;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 최상단 로고 영역 */
+        .top-header {
+            padding: 20px 40px;
+            z-index: 10;
+        }
+        .logo { width: 200px; }
+
+        /* 메인 레이아웃 (좌측 메뉴 + 중앙 화면) */
+        .game-layout {
+            display: flex;
+            flex: 1;
+            padding: 0 40px;
+            position: relative;
+        }
+
+        /* 좌측 사이드바 (전력량, 메뉴, 추천 질문) */
+        .sidebar {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        /* 유리 질감 공통 클래스 (Glassmorphism) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        /* 남은 전력량 UI */
+        .power-status { text-align: center; }
+        .power-status p {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .battery-icons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .battery {
+            width: 24px;
+            height: 24px;
+            background-color: #4a90e2; /* 기본 파란색 불빛 */
+            border: 2px solid #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.8);
+        }
+        /* 전력이 소모되었을 때의 클래스 */
+        .battery.empty {
+            background-color: #1a2235;
+            box-shadow: none;
+        }
+
+        /* 사이드바 메뉴 버튼들 */
+        .menu-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-yellow { background-color: #f7e9a0; color: #333; }
+        .btn-white { background-color: #e0e4e8; color: #333; }
+        .menu-btn:hover { transform: scale(1.02); opacity: 0.9; }
+
+        /* 추천 질문 박스 */
+        .recommend-box {
+            flex: 1; 
+            min-height: 200px;
+            font-family: 'DXTaja', sans-serif;
+            color: #d4d4d4;
+            line-height: 1.6;
+        }
+
+        /* 중앙 화면 (캐릭터 & 홀로그램) */
+        .center-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 피코 이미지 */
+        .character-pico {
+            width: 350px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 하단 채팅 입력창 */
+        .chat-container {
+            padding: 30px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+        .chat-input-wrapper {
+            width: 70%;
+            display: flex;
+            align-items: center;
+            background: rgba(40, 40, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .chat-input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            outline: none;
+            padding: 10px;
+            font-family: 'DXTaja', sans-serif; 
+        }
+        .chat-input-wrapper input::placeholder { color: #aaa; }
+        .send-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .send-btn:hover { background: rgba(255, 255, 255, 0.5); }
     </style>
-  </head>
-  <body>
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2>{{ bot.name }}</h2>
-        <button
-          class="close-btn"
-          onclick="window.location.href='{{ url_for('index') }}'"
-        >
-          &times;
-        </button>
-      </div>
+</head>
+<body>
 
-      <div class="modal-content">
-        <img
-          src="./static/images/hateslop/logo_black_genai.png"
-          alt="{{ bot.name }}"
-          class="bot-image"
-        />
+    <!-- 상단 로고 -->
+    <header class="top-header">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Project Ariadne" class="logo">
+    </header>
 
-        <div class="bot-info">
-          <h1>{{ bot.name }}</h1>
+    <!-- 메인 레이아웃 -->
+    <div class="game-layout">
+        
+        <!-- 좌측 사이드바 -->
+        <div class="sidebar">
+            <div class="glass-panel power-status">
+                <p>남은 전력량 (질문 기회)</p>
+                <div class="battery-icons">
+                    <!-- 기본적으로 5개의 불이 들어와 있음 -->
+                    <div class="battery" id="bat-5"></div>
+                    <div class="battery" id="bat-4"></div>
+                    <div class="battery" id="bat-3"></div>
+                    <div class="battery" id="bat-2"></div>
+                    <div class="battery" id="bat-1"></div>
+                </div>
+            </div>
 
-          <div class="tags">
-            {% for tag in bot.tags %}
-            <span class="tag">{{ tag }}</span>
-            {% endfor %}
-          </div>
+            <button class="menu-btn btn-yellow">◎ 단서 노트</button>
+            <button class="menu-btn btn-white">✴ 추천 질문</button>
+
+            <!-- 추천 질문 리스트 -->
+            <div class="glass-panel recommend-box" id="recommend-list">
+                <p style="margin-bottom: 10px; color: #8ab4f8;">[시스템 권장 질문]</p>
+                <p style="cursor: pointer; margin-bottom: 8px;">> 나는 너에게 뭘 자주 물었어?</p>
+                <p style="cursor: pointer; margin-bottom: 8px;">> 너는 나를 어떤 사용자로 기억해?</p>
+                <p style="cursor: pointer;">> 내가 특히 잘한 건 뭐야?</p>
+            </div>
         </div>
 
-        <div class="username-area">
-          <label for="username">이름:</label>
-          <input type="text" id="username" placeholder="이름을 입력하세요" />
+        <!-- 중앙 화면 -->
+        <div class="center-screen">
+            <!-- 챗봇 피코 -->
+            <img src="{{ url_for('static', filename='images/pico.png') }}" alt="{{ bot.name }}" class="character-pico" id="pico-avatar">
+            
+            <!-- 대화가 출력될 공간 (임시) -->
+            <div id="chat-history" style="margin-top: 20px; font-family: 'DXTaja'; font-size: 1.3rem; text-align: center; color: #ffeb3b; text-shadow: 0 0 10px rgba(255, 235, 59, 0.5); max-width: 600px; word-break: keep-all;">
+                "안구 움직임 감지, 심박 92. 신체는 정상이군요. 여기가 어디인지 기억나시나요?"
+            </div>
         </div>
 
-        <a href="#" class="start-chat" id="start-chat-btn">채팅 시작하기</a>
-      </div>
+    </div>
+
+    <!-- 하단 채팅 입력창 -->
+    <div class="chat-container">
+        <div class="chat-input-wrapper">
+            <span style="font-size: 1.5rem; color: #888; margin-right: 10px;">✴</span>
+            <input type="text" id="user-input" placeholder="피코에게 질문 입력..." autocomplete="off">
+            <button id="send-btn" class="send-btn">↑</button>
+        </div>
     </div>
 
     <script>
-      const startChatBtn = document.getElementById("start-chat-btn");
-      const usernameInput = document.getElementById("username");
+        // 전송 버튼 누르면 질문 횟수(배터리) 깎이는 간단한 테스트 스크립트
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatHistory = document.getElementById('chat-history');
+        let power = 5;
 
-      startChatBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        const username = usernameInput.value.trim() || "사용자";
-        window.location.href = `/chat?username=${encodeURIComponent(username)}`;
-      });
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
 
-      usernameInput.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-          startChatBtn.click();
+            if (power <= 0) {
+                typeMessage("전력이 모두 소모되었습니다. 더 이상 질문할 수 없습니다.", false);
+                return;
+            }
+
+            userInput.value = '';
+            
+            document.getElementById(`bat-${power}`).classList.add('empty');
+            power--;
+
+            typeMessage(message, true);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) throw new Error('Network Error');
+                
+                const data = await response.json();
+                typeMessage(data.response, false);
+
+            } catch (error) {
+                typeMessage("통신 오류가 발생했습니다. 시스템을 재부팅해주세요.", false);
+            }
         }
-      });
+
+        function typeMessage(text, isUser) {
+            chatHistory.innerHTML = '';
+            
+            const prefix = isUser ? "나: " : "피코: ";
+            const fullText = prefix + text;
+            let i = 0;
+            
+            chatHistory.style.color = isUser ? "#ffffff" : "#ffeb3b";
+            chatHistory.style.textShadow = isUser ? "none" : "0 0 10px rgba(255, 235, 59, 0.5)";
+
+            function typeWriter() {
+                if (i < fullText.length) {
+                    chatHistory.innerHTML += fullText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30);
+                }
+            }
+            typeWriter();
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        const recommendItems = document.querySelectorAll('#recommend-list p');
+        recommendItems.forEach((item, index) => {
+            if (index > 0) {
+                item.addEventListener('click', () => {
+                    userInput.value = item.textContent.replace('> ', '');
+                    userInput.focus();
+                });
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
