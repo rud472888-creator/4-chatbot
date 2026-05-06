@@ -522,11 +522,13 @@ class ChatbotService:
             # [6단계] imageType 결정 (키워드 기반)
             # ──────────────────────────────────────────────
             image_type = "none"
-            lower_msg = user_message.lower()
-            if "집" in user_message or "house" in lower_msg:
-                image_type = "house"
-            elif "sns" in lower_msg or "포스트" in user_message:
-                image_type = "sns"
+            image_hints_enabled = self.config.get("features", {}).get("image_hints", False)
+            if image_hints_enabled:
+                lower_msg = user_message.lower()
+                if "집" in user_message or "house" in lower_msg:
+                    image_type = "house"
+                elif "sns" in lower_msg or "포스트" in user_message:
+                    image_type = "sns"
 
             # ──────────────────────────────────────────────
             # [7단계] 응답 반환
