@@ -902,6 +902,7 @@
                 showChatRecord: false,
                 showRoleAuth: true,
                 roleAuthImage: "images/hateslop/role_input_display.png",
+                isJobInputScene: true,
                 inputBgImage: "images/hateslop/user_input.png",
                 bgImage: "images/hateslop/door_bg.jpg"
             },
@@ -980,7 +981,7 @@
             {
                 id: 21,
                 text: "이제 다시 한 번 역할을 입력해보세요.",
-                showArrow: true,
+                showArrow: false,
                 showPico: true,
                 showHologram: false,
                 isBriefing: false,
@@ -988,6 +989,7 @@
                 showMissionFile: false,
                 showChatRecord: false, // 대화 기록 창 끄기
                 showRoleAuth: false,   // 역할 인증 창 끄기
+                isJobInputScene: true,
                 inputBgImage: "images/hateslop/user_input.png",
                 bgImage: "images/hateslop/door_bg.jpg"
             },
@@ -1031,7 +1033,7 @@
                 showMissionFile: false,
                 showChatRecord: false,
                 showRoleAuth: true,
-                roleAuthImage: "images/hateslop/역할 인증-조종실 문_ 역할 인증 성공 시.jpg", 
+                roleAuthImage: "images/hateslop/role_authentication_success_display.png",
                 inputBgImage: "images/hateslop/user_input.png",
                 bgImage: "images/hateslop/door_bg.jpg"
             },
@@ -1071,6 +1073,7 @@
                 showChatRecord: false,
                 showRoleAuth: true, // 2차 인증 디스플레이 활성화
                 roleAuthImage: "images/hateslop/name_input_display.png", 
+                isNameInputScene: true,
                 sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png", 
                 powerBgImage: "images/hateslop/cockpit_left_electric.png", 
                 recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
@@ -1323,7 +1326,9 @@
         let typingInterval;
         let questionCount = 0;
         let currentPhase = "name";
+        let jobFailCount = 0;
         let nameFailCount = 0;
+        let isJobInputMode = false;
         let isNameInputMode = false;
         let autoAdvanceTimer = null;
 
@@ -1391,6 +1396,12 @@
                 return;
             }
 
+            if (currentScene.returnSceneIndex !== undefined && currentSceneIndex >= scenes.length - 1) {
+                currentSceneIndex = currentScene.returnSceneIndex;
+                renderScene(currentSceneIndex);
+                return;
+            }
+
             if (currentSceneIndex < scenes.length - 1) {
                 currentSceneIndex++;
                 renderScene(currentSceneIndex);
@@ -1428,14 +1439,16 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: userMessage,
-                        phase: isNameInputMode ? "name" : "question"
+                        phase: isNameInputMode ? "name" : (isJobInputMode ? "job" : "question")
                     })
                 });
                 const data = await response.json();
                 return {
                     answer: data.answer ?? data.reply ?? "",
                     imageType: data.imageType ?? "none",
-                    isQuestion: data.isQuestion ?? !isNameInputMode,
+                    isQuestion: data.isQuestion ?? (!isNameInputMode && !isJobInputMode),
+                    isJobAttempt: data.isJobAttempt ?? isJobInputMode,
+                    isJobCorrect: data.isJobCorrect ?? false,
                     isNameAttempt: data.isNameAttempt ?? isNameInputMode,
                     isNameCorrect: data.isNameCorrect ?? false,
                 };
@@ -1444,6 +1457,8 @@
                     answer: "시스템 오류: 통신에 실패했습니다.",
                     imageType: "none",
                     isQuestion: false,
+                    isJobAttempt: false,
+                    isJobCorrect: false,
                     isNameAttempt: false,
                     isNameCorrect: false
                 };
@@ -1463,6 +1478,7 @@
                     showMissionFile: false,
                     showChatRecord: true,
                     chatRecordImage: "images/hateslop/last_chat_display.png",
+                    returnSceneIndex: currentSceneIndex,
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
@@ -1486,10 +1502,25 @@
             const answerText = aiResponse.answer;
             const imageType = aiResponse.imageType; 
             const isQuestion = aiResponse.isQuestion;
+            const isJobAttempt = aiResponse.isJobAttempt;
+            const isJobCorrect = aiResponse.isJobCorrect;
             const isNameAttempt = aiResponse.isNameAttempt; 
             const isNameCorrect = aiResponse.isNameCorrect; 
 
             const nextId = scenes[scenes.length - 1].id + 1;
+
+            if (isJobAttempt) {
+                isJobInputMode = false;
+                if (isJobCorrect) {
+                    currentSceneIndex = scenes.findIndex(scene => scene.id === 24);
+                    renderScene(currentSceneIndex);
+                } else {
+                    jobFailCount++;
+                    currentSceneIndex = scenes.findIndex(scene => scene.id === (jobFailCount === 1 ? 17 : 22));
+                    renderScene(currentSceneIndex);
+                }
+                return;
+            }
 
             if (isNameAttempt) {
                 isNameInputMode = false;
@@ -1741,6 +1772,7 @@
                 showChatRecord: false,
                 showRoleAuth: isImageMode,
                 roleAuthImage: isImageMode ? imagePath : "",
+                returnSceneIndex: isImageMode ? currentSceneIndex : undefined,
                 sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                 inputBgImage: "images/hateslop/cockpit_input.png",
                 powerBgImage: "images/hateslop/cockpit_left_electric.png",
@@ -1898,7 +1930,7 @@
                 nextSceneLogic();
                 return;
             }
-            if (!isNameInputMode) {
+            if (!isNameInputMode && !isJobInputMode) {
                 if (currentBattery <= 0) return;
                 decreaseBattery();
             }
@@ -1907,6 +1939,7 @@
         
         function renderScene(index) {
             const scene = scenes[index];
+            isJobInputMode = scene.isJobInputScene === true;
             isNameInputMode = scene.isNameInputScene === true;
 
             const picoImageElement = document.getElementById("pico-avatar");
@@ -1929,6 +1962,9 @@
             }
 
             clearInterval(typingInterval);
+            [nextArrowBtn, briefingNextBtn, missionNextBtn, recordNextBtn, roleAuthNextBtn].forEach(btn => {
+                if (btn) btn.style.visibility = 'hidden';
+            });
 
             // 배경 및 입력창 배경 업데이트
             if (scene.bgImage) {
