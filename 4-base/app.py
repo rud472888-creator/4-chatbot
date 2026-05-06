@@ -108,16 +108,17 @@ def api_chat():
         data = request.get_json()
         user_message = data.get('message', '')
         username = data.get('username', '사용자')
-        
+        phase = data.get('phase', 'question')
+
         if not user_message:
             return jsonify({'error': 'Message is required'}), 400
-        
+
         # 챗봇 서비스 임포트 (지연 로딩)
         from services import get_chatbot_service
-        
+
         # 응답 생성
         chatbot = get_chatbot_service()
-        response = chatbot.generate_response(user_message, username)
+        response = chatbot.generate_response(user_message, username, phase)
         
         return jsonify(response)
         

@@ -2,6 +2,7 @@
   "name": "피코 (PICO)",
   "description": "프로메테우스 호의 메인 AI 시스템입니다.<br>현재 우주선은 소행성 충돌로 시스템이 손상되어 표류 중입니다.<br>보안 프로토콜에 따라 직접적인 정보 제공은 불가능하지만,<br>단서를 통해 당신이 누구인지 추론하도록 도울 수 있습니다.",
   "tags": ["#우주선AI", "#밀실탈출", "#기억상실", "#추리"],
+  "player_name": "마테오 리베라",
   "game_settings": {
     "max_questions_job": 5,
     "max_questions_name": 5,

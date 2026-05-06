@@ -157,7 +157,10 @@
         }
 
         .recommend-text-list li {
-            cursor: default; 
+            cursor: pointer;
+        }
+        .recommend-text-list li:hover {
+            color: #f7e9a0;
         }
 
         .recommend-wrapper .recommend-text-list {
@@ -603,6 +606,11 @@
 <body>
     <div id="fade-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 99999; pointer-events: none; transition: opacity 1s ease;"></div>
 
+    <div id="start-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:99998; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <img src="{{ url_for('static', filename='images/hateslop/start_bg.png') }}" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1;" alt="배경">
+        <img src="{{ url_for('static', filename='images/hateslop/start_start_button.png') }}" id="game-start-btn" style="position:relative; z-index:2; margin-top:15%; cursor:pointer; width:150px; transition:transform 0.2s ease, filter 0.2s ease;" alt="START">
+    </div>
+
     <!-- [피코 대화 시작] -->
     <div id="main-game-ui" style="display: none;">
         <header class="top-header">
@@ -711,113 +719,7 @@
      
 
     <script>
-        // 전송 버튼 누르면 질문 횟수(배터리) 깎이는 간단한 테스트 스크립트
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const chatHistory = document.getElementById('chat-history');
-        
-        let power = 5;
-
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-
-            // 삭제
-            if (message === '/정답') {
-            userInput.value = '';
-            triggerPhaseTransition();
-            return;
-            }
-            // 삭제
-
-            if (power <= 0) {
-                typeMessage("전력이 모두 소모되었습니다. 더 이상 질문할 수 없습니다.", false);
-                return;
-            }
-
-            userInput.value = '';
-            
-            document.getElementById(`bat-${power}`).classList.add('empty');
-            power--;
-
-            typeMessage(message, true);
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: message })
-                });
-
-                if (!response.ok) throw new Error('Network Error');
-                
-                const data = await response.json();
-                typeMessage(data.response, false);
-
-            } catch (error) {
-                typeMessage("통신 오류가 발생했습니다. 시스템을 재부팅해주세요.", false);
-            }
-        }
-
-        function typeMessage(text, isUser) {
-            chatHistory.innerHTML = '';
-            
-            const prefix = isUser ? "나: " : "피코: ";
-            const fullText = prefix + text;
-            let i = 0;
-            
-            chatHistory.style.color = isUser ? "#ffffff" : "#ffeb3b";
-            chatHistory.style.textShadow = isUser ? "none" : "0 0 10px rgba(255, 235, 59, 0.5)";
-
-            function typeWriter() {
-                if (i < fullText.length) {
-                    chatHistory.innerHTML += fullText.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 30);
-                }
-            }
-            typeWriter();
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        const recommendItems = document.querySelectorAll('.recommend-text-list li');
-
-        recommendItems.forEach((item) => {
-            item.addEventListener('click', () => {
-                // 기존의 '> ' 대신 이번엔 '- ' 기호를 잘라내도록 수정
-                userInput.value = item.textContent.replace('- ', '').trim();
-                userInput.focus();
-            });
-        });
         const picoAvatar = document.getElementById('pico-avatar');
-        const hologramScreen = document.getElementById('hologram-screen');
-
-        // 🌟 페이즈 전환 연출 함수
-        function triggerPhaseTransition() {
-            // 1. 피코 퇴장 애니메이션 실행
-            picoAvatar.classList.add('fade-out');
-            
-            // 2. 1초 뒤 (피코가 완전히 사라진 후) 홀로그램 등장
-            setTimeout(() => {
-                picoAvatar.style.display = 'none'; // DOM에서 완전히 숨김
-                hologramScreen.classList.add('fade-in'); // 홀로그램 띄우기
-                
-                // 시스템 메시지 타자기로 출력
-                typeMessage("[시스템 알림] 1차 인증 완료. 조종실 출입 잠금이 해제됩니다.", false);
-                
-                // 텍스트 색상을 시스템 알림 느낌의 파란색으로 변경
-                chatHistory.style.color = "#4a90e2";
-                chatHistory.style.textShadow = "0 0 10px rgba(74, 144, 226, 0.5)";
-            }, 1000);
-        }
     </script>
     <script>
         const scenes = [
@@ -844,7 +746,7 @@
             {
                 id: 2,
                 text: "\"현재 상황을 브리핑해드릴까요? 준비되면 대답해주세요\"",
-                showArrow: true, // 테스트를 위해 다음 화살표 켜둠 (나중에 false로 변경 가능)
+                showArrow: true,
                 showPico: true,
                 showHologram: false,
                 showRecommendText: false,
@@ -870,7 +772,8 @@
                 isBriefing: false,
                 showRecommendText: false,
                 inputBgImage: "images/hateslop/user_input.png",
-                bgImage: "images/hateslop/door_bg.jpg"
+                bgImage: "images/hateslop/door_bg.jpg",
+                autoAdvanceSec: 5
             },
             {
                 id: 5,
@@ -941,7 +844,7 @@
             {
                 id: 11,
                 text: "하지만 공짜로 질문을 받아줄 순 없죠. 크하하 장난이고요. 질문 한 번마다 보조 전력이 소모됩니다. 제 수다에도 전기가 든다는 뜻이죠. 그러니 똑똑하게 질문을 해보세요!",
-                showArrow: false, 
+                showArrow: true,
                 showPico: true,
                 showHologram: false,
                 isBriefing: false,
@@ -964,14 +867,15 @@
             {
                 id: 13,
                 text: "이건 프로젝트 파일이에요. 다행히도 이건 보여드릴 수 있어요! 이제 저에게 물어보고 싶은 건 없나요?",
-                showArrow: true,
+                showArrow: false,
                 showPico: true,
                 showHologram: false,
                 isBriefing: false,
                 showRecommendText: true,
                 showMissionFile: false,
                 inputBgImage: "images/hateslop/user_input.png",
-                bgImage: "images/hateslop/corridor_bg.jpg"
+                bgImage: "images/hateslop/corridor_bg.jpg",
+                advanceOnInput: true
             },
             {
                 id: 14,
@@ -982,6 +886,7 @@
                 showRecommendText: true,
                 showMissionFile: false,
                 showChatRecord: true,
+                chatRecordImage: "images/hateslop/last_chat_display.png",
                 inputBgImage: "images/hateslop/user_input.png",
                 bgImage: "images/hateslop/corridor_bg.jpg"
             },
@@ -1411,12 +1316,16 @@
             }
         ];
 
-        let currentSceneIndex = 33;
+        const sendBtn = document.getElementById('send-btn');
+
+        let currentSceneIndex = 0;
         let currentBattery = 5;
         let typingInterval;
         let questionCount = 0;
         let currentPhase = "name";
         let nameFailCount = 0;
+        let isNameInputMode = false;
+        let autoAdvanceTimer = null;
 
         const centerDisplayWrapper = document.getElementById('center-display-wrapper');
         const standardChatArea = document.getElementById('standard-chat-area');
@@ -1461,7 +1370,15 @@
             }
         }
 
+        function clearAutoAdvance() {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+                autoAdvanceTimer = null;
+            }
+        }
+
         const nextSceneLogic = () => {
+            clearAutoAdvance();
             const currentScene = scenes[currentSceneIndex];
 
             if (currentScene.triggerEnding) {
@@ -1475,18 +1392,11 @@
             }
 
             if (currentSceneIndex < scenes.length - 1) {
-                mainGameUI.style.transition = 'opacity 0.8s ease';
-                mainGameUI.style.opacity = '0';
-                
-                setTimeout(() => {
-                    currentSceneIndex++;
-                    renderScene(currentSceneIndex);
-                    mainGameUI.style.opacity = '1';
-                }, 800);
+                currentSceneIndex++;
+                renderScene(currentSceneIndex);
             }
         };
 
-        // 성공 영상 재생 전용 함수
         function playSuccessVideo(videoFileName, nextIndex) {
             if (videoOverlay && endingVideo) {
                 videoOverlay.style.display = 'block';
@@ -1494,10 +1404,20 @@
                 endingVideo.play();
 
                 endingVideo.onended = () => {
-                    videoOverlay.style.display = 'none'; // 영상 레이어 숨김
-                    currentSceneIndex = nextIndex; // 인덱스를 25로 변경
-                    renderScene(currentSceneIndex); // 25번 장면 렌더링
+                    if (nextIndex !== null && nextIndex !== undefined) {
+                        videoOverlay.style.display = 'none';
+                        currentSceneIndex = nextIndex;
+                        renderScene(currentSceneIndex);
+                    }
                 };
+            }
+        }
+
+        function playEndingVideo(videoFileName) {
+            if (videoOverlay && endingVideo) {
+                videoOverlay.style.display = 'block';
+                endingVideo.src = `/static/videos/${videoFileName}`;
+                endingVideo.play();
             }
         }
 
@@ -1506,13 +1426,22 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMessage })
+                    body: JSON.stringify({
+                        message: userMessage,
+                        phase: isNameInputMode ? "name" : "question"
+                    })
                 });
                 const data = await response.json();
-                return data; 
+                return {
+                    answer: data.answer ?? data.reply ?? "",
+                    imageType: data.imageType ?? "none",
+                    isQuestion: data.isQuestion ?? !isNameInputMode,
+                    isNameAttempt: data.isNameAttempt ?? isNameInputMode,
+                    isNameCorrect: data.isNameCorrect ?? false,
+                };
             } catch (error) {
-                return { 
-                    answer: "시스템 오류: 통신에 실패했습니다.", 
+                return {
+                    answer: "시스템 오류: 통신에 실패했습니다.",
                     imageType: "none",
                     isQuestion: false,
                     isNameAttempt: false,
@@ -1522,6 +1451,37 @@
         }
 
         async function handleUserInput(userMessage) {
+            if (userMessage.includes('대화 기록')) {
+                const nextId = scenes[scenes.length - 1].id + 1;
+                const chatRecordScene = {
+                    id: nextId,
+                    showArrow: true,
+                    showPico: false,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: true,
+                    chatRecordImage: "images/hateslop/last_chat_display.png",
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: [
+                        "내가 살던 집 사진을 보여줘",
+                        "내 인간관계는 어땠지?",
+                        "내 평소 습관을 알려줘",
+                        "내 취미는 어땠지?",
+                        "최근 SNS 포스트를 보여줘"
+                    ]
+                };
+                scenes.push(chatRecordScene);
+                currentSceneIndex = scenes.length - 1;
+                renderScene(currentSceneIndex);
+                return;
+            }
+
             const aiResponse = await fetchAIResponse(userMessage);
             const answerText = aiResponse.answer;
             const imageType = aiResponse.imageType; 
@@ -1532,6 +1492,7 @@
             const nextId = scenes[scenes.length - 1].id + 1;
 
             if (isNameAttempt) {
+                isNameInputMode = false;
                 if (isNameCorrect) {
                     const successScene = {
                         id: nextId,
@@ -1682,15 +1643,16 @@
                         const failFollowUp6 = {
                             id: nextId + 6,
                             text: "",
-                            showArrow: false, 
-                            showPico: false, // 피코 숨김
+                            showArrow: false,
+                            showPico: false,
                             showHologram: false,
                             isBriefing: false,
                             showRecommendText: true,
                             showMissionFile: false,
                             showChatRecord: false,
-                            showRoleAuth: true, // 디스플레이 켜기
-                            roleAuthImage: "images/hateslop/name_1st_fail.png", 
+                            showRoleAuth: true,
+                            roleAuthImage: "images/hateslop/name_input_display.png",
+                            isNameInputScene: true,
                             sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                             inputBgImage: "images/hateslop/cockpit_input.png",
                             powerBgImage: "images/hateslop/cockpit_left_electric.png",
@@ -1699,9 +1661,8 @@
                             recommendQuestions: []
                         };
 
-                        // 기존 4개에서 새로운 3장면(4, 5, 6)을 추가해 총 7개의 장면을 푸시합니다.
                         scenes.push(failScene, failFollowUp1, failFollowUp2, failFollowUp3, failFollowUp4, failFollowUp5, failFollowUp6);
-                        currentSceneIndex = scenes.length - 7; 
+                        currentSceneIndex = scenes.length - 7;
                         renderScene(currentSceneIndex);
                     } else if (nameFailCount === 2) {
                         const finalFailScene = {
@@ -1913,22 +1874,42 @@
                     showMissionFile: false,
                     showChatRecord: false,
                     showRoleAuth: true,
-                    roleAuthImage: "images/hateslop/name_input_display.png", 
+                    roleAuthImage: "images/hateslop/name_input_display.png",
+                    isNameInputScene: true,
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
                     recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
-                    recommendQuestions: [] 
+                    recommendQuestions: []
                 };
 
                 scenes.push(exhaustScene1, exhaustScene2, exhaustScene3, exhaustScene4);
             }
         }
+
+        async function onSendClick() {
+            const message = userInputField.value.trim();
+            if (!message) return;
+            userInputField.value = '';
+            clearAutoAdvance();
+            const currentScene = scenes[currentSceneIndex];
+            if (currentScene && currentScene.advanceOnInput) {
+                nextSceneLogic();
+                return;
+            }
+            if (!isNameInputMode) {
+                if (currentBattery <= 0) return;
+                decreaseBattery();
+            }
+            await handleUserInput(message);
+        }
         
         function renderScene(index) {
             const scene = scenes[index];
-            const picoImageElement = document.getElementById("pico-image"); // (실제 피코 img의 ID나 클래스)
+            isNameInputMode = scene.isNameInputScene === true;
+
+            const picoImageElement = document.getElementById("pico-avatar");
 
             if (scene.picoPosition === "bottom-left") {
                 picoImageElement.style.transform = "scale(0.7)"; // 크기 약간 줄이기
@@ -1950,9 +1931,13 @@
             clearInterval(typingInterval);
 
             // 배경 및 입력창 배경 업데이트
-            document.body.style.backgroundImage = `url('/static/${scene.bgImage}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
+            if (scene.bgImage) {
+                document.body.style.backgroundImage = `url('/static/${scene.bgImage}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+            } else {
+                document.body.style.backgroundImage = '';
+            }
             dynamicInputBg.src = `/static/${scene.inputBgImage}`;
 
             if (sidebarMainBg && scene.sidebarMainBgImage) {
@@ -2105,6 +2090,9 @@
                     if (scene.showArrow) {
                         targetArrowBtn.style.visibility = 'visible';
                     }
+                    if (scene.autoAdvanceSec) {
+                        autoAdvanceTimer = setTimeout(nextSceneLogic, scene.autoAdvanceSec * 1000);
+                    }
                 }
             }, 40);
         }
@@ -2141,34 +2129,37 @@
         if (missionNextBtn) missionNextBtn.addEventListener('click', nextSceneLogic);
         if (roleAuthNextBtn) roleAuthNextBtn.addEventListener('click', nextSceneLogic);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // detail.html의 기존 페이드인 효과 안에 유지
-            const fadeOverlay = document.getElementById('fade-overlay');
-            if (fadeOverlay) {
-                setTimeout(() => { fadeOverlay.style.opacity = '0'; }, 100);
-                setTimeout(() => { renderScene(currentSceneIndex); }, 1100);
-            } else {
-                playIntroSequence();
-            }
+        if (sendBtn) sendBtn.addEventListener('click', onSendClick);
+        if (userInputField) userInputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') onSendClick();
         });
 
-        if (recommendItems.length > 0 && userInputField) {
-            recommendItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    let questionText = item.textContent.trim();
-                    
-                    if (questionText.startsWith('- ')) {
-                        questionText = questionText.substring(2);
-                    }
-                    
-                    userInputField.value = questionText;
+        if (recommendTextList) {
+            recommendTextList.addEventListener('click', (e) => {
+                const li = e.target.closest('li');
+                if (li && userInputField) {
+                    userInputField.value = li.textContent.replace(/^-\s*/, '').trim();
                     userInputField.focus();
-                });
+                }
             });
         }
 
-        mainGameUI.style.display = 'block'; // 숨겨져 있던 전체 UI를 강제로 보여줌!
-        renderScene(currentSceneIndex);     // 화면 렌더링 시작!
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('fade-overlay').style.opacity = '0';
+            const startBtn = document.getElementById('game-start-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', () => {
+                    const startScreen = document.getElementById('start-screen');
+                    startScreen.style.transition = 'opacity 0.6s';
+                    startScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        startScreen.style.display = 'none';
+                        mainGameUI.style.display = 'block';
+                        renderScene(0);
+                    }, 600);
+                });
+            }
+        });
     </script>
 </body>
 </html>

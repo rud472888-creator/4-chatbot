@@ -321,21 +321,38 @@ class ChatbotService:
     # 응답 생성 파이프라인
     # ================================================================
 
-    def generate_response(self, user_message: str, username: str = "사용자") -> dict:
+    def generate_response(self, user_message: str, username: str = "사용자", phase: str = "question") -> dict:
         """
         사용자 메시지에 대한 챗봇 응답 생성
 
         Args:
             user_message (str): 사용자 입력
             username (str): 사용자 이름
+            phase (str): 현재 게임 페이즈 ("question" 또는 "name")
 
         Returns:
             dict: {
-                'reply': str,       # 챗봇 응답 텍스트
-                'image': str|None   # 이미지 경로 (선택)
+                'reply': str, 'answer': str,
+                'image': str|None, 'imageType': str,
+                'isQuestion': bool, 'isNameAttempt': bool, 'isNameCorrect': bool
             }
         """
         try:
+            # ──────────────────────────────────────────────
+            # [0단계] 이름 인증 페이즈 처리
+            # ──────────────────────────────────────────────
+            if phase == "name":
+                correct_name = self.config.get("player_name", "")
+                is_correct = user_message.strip() == correct_name
+                reply = "이름 인증 성공." if is_correct else "이름 인증 실패."
+                return {
+                    "reply": reply, "answer": reply,
+                    "image": None, "imageType": "none",
+                    "isQuestion": False,
+                    "isNameAttempt": True,
+                    "isNameCorrect": is_correct,
+                }
+
             # ──────────────────────────────────────────────
             # [1단계] 초기 메시지 처리
             # ──────────────────────────────────────────────
@@ -352,7 +369,11 @@ class ChatbotService:
                     f"먼저 역할부터 알아내 볼까요? "
                     f"지금부터의 답변을 잘 조합해 보면 방향이 보일 거예요."
                 )
-                return {"reply": init_reply, "image": None}
+                return {
+                    "reply": init_reply, "answer": init_reply,
+                    "image": None, "imageType": "none",
+                    "isQuestion": False, "isNameAttempt": False, "isNameCorrect": False,
+                }
 
             # ──────────────────────────────────────────────
             # [2단계] RAG 검색 수행
@@ -407,14 +428,29 @@ class ChatbotService:
             self._save_to_buffer(user_message, reply)
 
             # ──────────────────────────────────────────────
-            # [6단계] 응답 반환
+            # [6단계] imageType 결정 (키워드 기반)
+            # ──────────────────────────────────────────────
+            image_type = "none"
+            lower_msg = user_message.lower()
+            if "집" in user_message or "house" in lower_msg:
+                image_type = "house"
+            elif "sns" in lower_msg or "포스트" in user_message:
+                image_type = "sns"
+
+            # ──────────────────────────────────────────────
+            # [7단계] 응답 반환
             # ──────────────────────────────────────────────
             print(f"[BOT] {reply}")
             print(f"{'='*50}\n")
 
             return {
                 "reply": reply,
-                "image": None,  # 이미지 검색 로직 추가 가능
+                "answer": reply,
+                "image": None,
+                "imageType": image_type,
+                "isQuestion": True,
+                "isNameAttempt": False,
+                "isNameCorrect": False,
             }
 
         except Exception as e:
@@ -423,7 +459,9 @@ class ChatbotService:
             traceback.print_exc()
             return {
                 "reply": "삐빅... 시스템에 일시적인 오류가 발생했어요. 다시 한 번 말씀해주시겠어요?",
-                "image": None,
+                "answer": "삐빅... 시스템에 일시적인 오류가 발생했어요. 다시 한 번 말씀해주시겠어요?",
+                "image": None, "imageType": "none",
+                "isQuestion": False, "isNameAttempt": False, "isNameCorrect": False,
             }
 
 
