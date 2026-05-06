@@ -959,8 +959,7 @@
                 showRecommendText: true,
                 showMissionFile: false,
                 inputBgImage: "images/hateslop/corridor_input.png",
-                bgImage: "images/hateslop/corridor_bg.jpg",
-                advanceOnInput: true
+                bgImage: "images/hateslop/corridor_bg.jpg"
             },
             {
                 id: 14,
@@ -1914,14 +1913,13 @@
                     id: nextId + 2,
                     text: "어때요? 조금 도움이 되죠! 이 흐름을 타서 빨리 다음 질문을 던져보세요!",
                     showArrow: false,
-                    showPico: false,
+                    showPico: true,
                     showHologram: false,
                     isBriefing: false,
                     showRecommendText: true,
                     showMissionFile: false,
                     showChatRecord: false,
-                    showRoleAuth: true,
-                    roleAuthImage: "images/hateslop/album_hint.png",
+                    showRoleAuth: false,
                     playAudio: "audios/hateslop/kpop_hint.mp3",
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
@@ -2024,11 +2022,6 @@
             if (!message) return;
             userInputField.value = '';
             clearAutoAdvance();
-            const currentScene = scenes[currentSceneIndex];
-            if (currentScene && currentScene.advanceOnInput) {
-                nextSceneLogic();
-                return;
-            }
             if (!isNameInputMode && !isJobInputMode) {
                 if (currentBattery <= 0) return;
                 decreaseBattery();
