@@ -241,6 +241,7 @@
             max-width: 750px;
             word-break: keep-all;
             line-height: 1.6;
+            white-space: pre-line;
         }
 
         /* 중앙 화면 (캐릭터 & 홀로그램) */
@@ -790,6 +791,22 @@
         const picoAvatar = document.getElementById('pico-avatar');
     </script>
     <script>
+        const LAST_CHAT_RECORD_TEXT = `[사고 직전 마지막 대화 로그]
+
+피코: EVA-1, EVA-2 통신 두절. 자동항법이 외부 B구역 접근 경로를 계산했습니다.
+사용자: 접근 보류. 먼저 B구역 선체 손상도 확인해.
+피코: 외부 B구역 패널 손상 감지. 미세 누출 가능성 있습니다. 자세 안정 장치와 산소 순환에도 부하가 걸리고 있습니다.
+사용자: 손상 구획부터 격리해. 산소 순환은 유지하고, 자세 안정 장치는 최소 출력으로 낮춰.
+피코: 샘플 보관함 압력도 불안정합니다. 격리 절차를 강화할까요?
+사용자: 격리는 유지. 보관함에 출력 더 쓰지 마. 최소 유지만 남겨.
+피코: 전체 복구를 시도합니까?
+사용자: 아니. 통신 수신, 산소 순환, 자세 안정만 우선. 손상 구획은 막고, 살아 있는 라인으로 우회해.
+피코: 표준 절차와 다릅니다.
+사용자: 표준 절차는 선체가 정상일 때 기준이야. 지금은 복구보다 유지가 먼저야.
+피코: 기능 축소 모드 전환?
+사용자: 수동 승인. 기록 남겨.
+[기록 손상]`;
+
         const scenes = [
             {
                 id: 0,
@@ -947,8 +964,9 @@
             },
             {
                 id: 14,
+                text: LAST_CHAT_RECORD_TEXT,
                 showArrow: true,
-                showPico: true,
+                showPico: false,
                 showHologram: false,
                 isBriefing: false,
                 showRecommendText: true,
@@ -1034,7 +1052,7 @@
             },
             {
                 id: 20,
-                text: "",
+                text: LAST_CHAT_RECORD_TEXT,
                 showArrow: true,
                 showPico: false, 
                 showHologram: false,
@@ -1042,7 +1060,7 @@
                 showRecommendText: true,
                 showMissionFile: false,
                 showChatRecord: true,
-                chatRecordImage: "images/hateslop/last_chat_display.png", 
+                chatRecordImage: "images/hateslop/last_chat_display.png",
                 inputBgImage: "images/hateslop/door_input.png",
                 bgImage: "images/hateslop/door_bg.jpg"
             },
@@ -1539,14 +1557,15 @@
                 const nextId = scenes[scenes.length - 1].id + 1;
                 const chatRecordScene = {
                     id: nextId,
+                    text: LAST_CHAT_RECORD_TEXT,
                     showArrow: true,
                     showPico: false,
                     showHologram: false,
                     isBriefing: false,
                     showRecommendText: true,
                     showMissionFile: false,
-                    showChatRecord: true,
-                    chatRecordImage: "images/hateslop/last_chat_display.png",
+                    showChatRecord: false,
+                    instantText: true,
                     returnSceneIndex: currentSceneIndex,
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
@@ -2196,6 +2215,17 @@
             // 텍스트 타이핑 로직
             targetTextObj.textContent = ""; 
             targetArrowBtn.style.visibility = 'hidden';
+
+            if (scene.instantText) {
+                targetTextObj.textContent = scene.text;
+                if (scene.showArrow) {
+                    targetArrowBtn.style.visibility = 'visible';
+                }
+                if (scene.autoAdvanceSec) {
+                    autoAdvanceTimer = setTimeout(nextSceneLogic, scene.autoAdvanceSec * 1000);
+                }
+                return;
+            }
 
             let charIndex = 0;
             typingInterval = setInterval(() => {
