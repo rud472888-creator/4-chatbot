@@ -16,7 +16,7 @@
 
         body {
             /* 우주선 배경 이미지 */
-            background-image: url("{{ url_for('static', filename='images/spaceship_bg.jpg') }}");
+            background-image: url("{{ url_for('static', filename='images/hateslop/corridor_bg.jpg') }}");
             background-size: cover;
             background-position: center;
             background-color: #050814;
@@ -28,12 +28,12 @@
             flex-direction: column;
         }
 
-        /* 최상단 로고 영역 */
         .top-header {
-            padding: 20px 40px;
-            z-index: 10;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            padding-left: 80px;
         }
-        .logo { width: 200px; }
+        .logo { width: 280px; }
 
         /* 메인 레이아웃 (좌측 메뉴 + 중앙 화면) */
         .game-layout {
@@ -62,57 +62,135 @@
             padding: 20px;
         }
 
-        /* 남은 전력량 UI */
-        .power-status { text-align: center; }
-        .power-status p {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            color: #ccc;
-        }
+        
+
+        /* 미니 피코 아이콘 5개 묶음 (배경 이미지 위로 띄움) */
         .battery-icons {
+            position: absolute; /* 중요! 이미지 위로 강제로 띄움 */
+            bottom: 22%; /* 배경 박스의 맨 아래에서 22% 높이에 배치 */
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 12px; /* 피코 아이콘 사이 간격 */
+        }
+
+        /* 5칸짜리 미니 피코 아이콘 기본 상태 */
+        .battery-img {
+            width: 24px; /* 박스 크기에 맞춰 아이콘 크기 살짝 조절 */
+            height: auto;
+            transition: all 0.3s ease;
+        }
+
+        /* 전력이 소모되었을 때의 클래스 */
+        .battery-img.empty {
+            opacity: 0.2;
+            filter: grayscale(100%);
+        }
+
+        .sidebar {
+            padding: 20px;
+            width: 360px;
+        }
+
+        .sidebar-panel-img {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+            z-index: 0;
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .ui-img-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .ui-img-box > img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .power-wrapper .battery-icons {
+            position: absolute;
+            bottom: 20%;
+            left: 0;
+            width: 100%;
             display: flex;
             justify-content: center;
             gap: 8px;
         }
-        .battery {
-            width: 24px;
-            height: 24px;
-            background-color: #4a90e2; /* 기본 파란색 불빛 */
-            border: 2px solid #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(74, 144, 226, 0.8);
-        }
-        /* 전력이 소모되었을 때의 클래스 */
-        .battery.empty {
-            background-color: #1a2235;
-            box-shadow: none;
-        }
 
-        /* 사이드바 메뉴 버튼들 */
         .menu-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: transform 0.2s ease;
         }
-        .btn-yellow { background-color: #f7e9a0; color: #333; }
-        .btn-white { background-color: #e0e4e8; color: #333; }
-        .menu-btn:hover { transform: scale(1.02); opacity: 0.9; }
 
-        /* 추천 질문 박스 */
-        .recommend-box {
-            flex: 1; 
-            min-height: 200px;
-            font-family: 'DXTaja', sans-serif;
-            color: #d4d4d4;
+        .menu-btn:hover {
+            transform: scale(1.03);
+        }
+
+        .recommend-text-list ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .recommend-text-list li {
+            cursor: default; 
+        }
+
+        .recommend-wrapper .recommend-text-list {
+            position: absolute;
+            top: 65px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .recommend-text-list p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            word-break: keep-all;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .recommend-text-list p:hover {
+            color: #f7e9a0;
+        }
+
+        .chat-history-text {
+            margin-top: 30px;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1.15rem;
+            text-align: center;
+            color: #a8d5e5;
+            max-width: 750px;
+            word-break: keep-all;
             line-height: 1.6;
         }
 
@@ -132,6 +210,90 @@
             animation: float 3s ease-in-out infinite;
         }
 
+        /* 레이아웃 전환 속성 */
+        .normal-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .briefing-layout {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            transform: translateY(-170px) translateX(0px);
+        }
+
+        /* 피코 크기 상태 */
+        .pico-normal {
+            width: 250px; /* 원래 피코 크기에 맞게 조절 */
+            transition: all 0.5s ease;
+        }
+
+        .pico-small {
+            width: 160px; /* 브리핑 시 작아지는 크기 */
+            transition: all 0.5s ease;
+        }
+
+        /* 브리핑 박스 디자인 */
+        /* 브리핑 텍스트 박스 + 화살표를 세로로 정렬하는 래퍼 */
+        .briefing-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* 화살표를 박스의 오른쪽 아래로 정렬 (가운데를 원하면 center로 변경) */
+            gap: 15px; /* 텍스트 박스와 화살표 사이의 간격 */
+            width: 650px;
+        }
+
+        /* 브리핑 박스 디자인 (첨부 이미지 배경 적용) */
+        .briefing-box {
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 680px;
+            height: 480px; 
+            padding: 55px 60px;
+            box-sizing: border-box; 
+            overflow: hidden;
+        }
+
+        .briefing-arrow-area {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            height: 40px; 
+            margin-top: 5px;
+            position: relative; /* 추가: z-index가 먹히도록 위치 기준점 설정 */
+            z-index: 999;       /* 추가: 무조건 맨 앞으로 오게 설정 */
+        }
+
+        #briefing-next-btn {
+            cursor: pointer;
+            transition: filter 0.2s; /* 부드러운 효과 */
+        }
+
+        .briefing-text {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1.0rem;
+            color: #cfd8dc;
+            white-space: pre-wrap;
+            line-height: 2.2;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .briefing-text::-webkit-scrollbar {
+            width: 0px; 
+        }
+
+        .align-right {
+            align-self: flex-end; /* 화살표를 우측 하단으로 */
+        }
+
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
@@ -140,114 +302,433 @@
 
         /* 하단 채팅 입력창 */
         .chat-container {
-            padding: 30px 40px;
-            display: flex;
-            justify-content: center;
-            z-index: 10;
+            position: fixed !important;
+            bottom: 60px; /* 🔼 상하 위치 조절 */
+            left: 450px;  /* ◀️▶️ 좌우 위치 조절 */
+            width: 950px !important; /* ↔️ 가로 길이 조절 */
+            z-index: 100;
         }
-        .chat-input-wrapper {
-            width: 70%;
+
+        .chat-container .send-btn {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 101;
+        }
+
+        .chat-text-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 800px;
+            min-height: 80px; /* 텍스트 박스 높이 고정 */
+        }
+
+        .chat-history-text {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1.15rem;
+            color: #a8d5e5;
+            word-break: keep-all;
+            line-height: 1.6;
+            text-align: center;
+            white-space: pre-wrap;
+            width: 600px; /* 텍스트 영역 너비 고정으로 화살표 밀림 방지 */
+        }
+
+        .next-arrow {
+            width: 35px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding-bottom: 5px;
+        }
+
+        .next-arrow:hover {
+            transform: translateX(8px);
+        }
+
+        .custom-input-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .input-bg-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px !important;
+            display: block;
+        }
+
+        .input-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
-            background: rgba(40, 40, 40, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0 20px;
+            box-sizing: border-box;
         }
-        .chat-input-wrapper input {
-            flex: 1;
+
+        #user-input {
+            flex-grow: 1;
             background: transparent;
             border: none;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            font-family: 'Pretendard', sans-serif;
             outline: none;
-            padding: 10px;
-            font-family: 'DXTaja', sans-serif; 
+            padding-left: 40px;
         }
-        .chat-input-wrapper input::placeholder { color: #aaa; }
-        .send-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
+
+        #user-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-img-btn {
             width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: white;
+            height: auto;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: 0.3s;
+            transition: transform 0.2s, opacity 0.2s;
         }
-        .send-btn:hover { background: rgba(255, 255, 255, 0.5); }
+
+        .send-img-btn:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+
+        .mission-file-image {
+            width: 650px;
+            height: 480px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .chat-record-image {
+            width: 680px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 페이즈 전환 애니메이션 클래스 */
+        .fade-out {
+            animation: fadeOut 1s forwards;
+        }
+
+        .fade-in {
+            display: block !important; /* display: none을 덮어씌움 */
+            animation: fadeIn 1s forwards;
+        }
+
+        .auth-panel-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            transform: translateY(65px);
+        }
+
+        .auth-image {
+            width: 750px;
+            height: auto;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.9) translateY(20px); visibility: hidden; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(1.1) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* =========================================
+          📱 모바일 전용 UI (화면 가로 768px 이하)
+          ========================================= */
+        @media screen and (max-width: 768px) {
+            /* 1. 상단 로고 숨기기 (시안에 맞춰 공간 확보) */
+            .top-header {
+                display: none;
+            }
+
+            /* 2. 전체 레이아웃 겹치게(Absolute) 변경 */
+            .game-layout {
+                padding: 0;
+                position: static; 
+            }
+
+            /* 3. 사이드바 UI를 우측 상단으로 띄우기 */
+            .sidebar {
+                position: absolute;
+                top: 30px;
+                right: 20px;
+                width: auto; /* 고정 너비 풀고 내용물에 맞춤 */
+                align-items: flex-end; /* 요소들을 오른쪽으로 정렬 */
+                z-index: 20;
+                gap: 10px;
+            }
+
+            /* 4. 유리 패널과 버튼 크기 모바일에 맞게 축소 */
+            .glass-panel {
+                padding: 10px 15px;
+                border-radius: 15px;
+            }
+            /* 전력량 라벨 이미지 크기 */
+            .power-label-img {
+                width: 100%;
+                max-width: 140px; /* 라벨 크기가 너무 커지지 않게 제한 */
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+
+            /* 5칸짜리 미니 피코 아이콘 기본 상태 */
+            .battery-img {
+                width: 28px; /* 피코 아이콘 크기 (원하는 대로 조절해!) */
+                height: auto;
+                transition: all 0.3s ease; /* 꺼질 때 부드럽게 변하도록 */
+            }
+
+            /* 전력이 소모되었을 때의 클래스 (흑백 처리 & 투명도 낮춤) */
+            .battery-img.empty {
+                opacity: 0.2; /* 투명하게 */
+                filter: grayscale(100%); /* 흑백으로 만들어서 불 꺼진 느낌 팍팍! */
+            }
+            /* 모바일 미디어 쿼리 안쪽의 기존 .menu-btn 코드를 지우고 아래 코드로 교체! */
+            .menu-image-btn {
+                width: 110px; /* 모바일에 맞게 이미지 크기 축소 */
+                margin: 0;    /* 모바일에서는 우측 상단으로 띄울 거니까 마진 제거 */
+            }
+
+            /* 5. 추천 질문 리스트는 모바일 화면을 너무 가리므로 일단 숨김 */
+            .recommend-wrapper {
+                position: relative;
+                width: 100%;
+                max-width: 320px;
+                margin-top: 20px;
+            }
+
+            .recommend-bg-img {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: 20px;
+            }
+
+            .recommend-content {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                padding: 25px 20px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .recommend-title {
+                color: #fff;
+                font-weight: bold;
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            .recommend-list p {
+                color: rgba(255, 255, 255, 0.85);
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                word-break: keep-all;
+                cursor: pointer;
+            }
+
+            .recommend-list p:hover {
+                color: #f7e9a0;
+            }
+
+            /* 6. 피코 이미지 중앙 하단으로 배치 */
+            .center-screen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                justify-content: flex-end; /* 아래쪽으로 밀어내기 */
+                padding-bottom: 150px; /* 채팅창에 가려지지 않게 여백 주기 */
+                z-index: 10;
+            }
+            .character-pico {
+                width: 250px; /* 모바일 비율에 맞춰 크기 축소 */
+            }
+
+            /* 7. 채팅창을 화면 맨 아래에 꽉 차게 고정 */
+            .chat-container {
+                position: fixed !important;
+                bottom: 60px; /* 🔼 상하 위치 조절 */
+                left: 450px;  /* ◀️▶️ 좌우 위치 조절 */
+                width: 950px !important; /* ↔️ 가로 길이 조절 */
+                z-index: 100;
+            }
+
+            .chat-container .send-btn {
+                position: absolute;
+                right: 30px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 101;
+            }
+            .custom-input-wrapper {
+                width: 100%;
+            }
+            
+            #user-input {
+                font-size: 1rem; /* 좁은 화면에 맞춰 글씨 크기 살짝 줄임 */
+                padding-left: 30px; /* 왼쪽에 있는 별모양 여백도 모바일에 맞춰 살짝 줄임 */
+            }
+
+            .send-img-btn {
+                width: 32px; /* 전송 버튼 이미지도 모바일 비율에 맞게 살짝 축소 */
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="fade-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 99999; pointer-events: none; transition: opacity 1s ease;"></div>
 
-    <!-- 상단 로고 -->
-    <header class="top-header">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Project Ariadne" class="logo">
-    </header>
+    <!-- [피코 대화 시작] -->
+    <div id="main-game-ui" style="display: none;">
+        <header class="top-header">
+            <img src="{{ url_for('static', filename='images/hateslop/logo.png') }}" alt="Project Ariadne" class="logo">
+        </header>
 
-    <!-- 메인 레이아웃 -->
-    <div class="game-layout">
-        
-        <!-- 좌측 사이드바 -->
-        <div class="sidebar">
-            <div class="glass-panel power-status">
-                <p>남은 전력량 (질문 기회)</p>
-                <div class="battery-icons">
-                    <!-- 기본적으로 5개의 불이 들어와 있음 -->
-                    <div class="battery" id="bat-5"></div>
-                    <div class="battery" id="bat-4"></div>
-                    <div class="battery" id="bat-3"></div>
-                    <div class="battery" id="bat-2"></div>
-                    <div class="battery" id="bat-1"></div>
+        <div class="game-layout">
+            <div class="sidebar">
+                <div class="sidebar-panel-img">
+                    <img src="{{ url_for('static', filename='images/hateslop/pico_chat_start_left_box.png') }}" class="bg-layer" alt="사이드바 대화 시작 배경">
+
+                    <div class="sidebar-content">
+                        <div class="ui-img-box power-wrapper">
+                            <img src="{{ url_for('static', filename='images/hateslop/pico_chat_start_left_engine.png') }}" alt="전력량">
+                            <div class="battery-icons">
+                                <img src="{{ url_for('static', filename='images/hateslop/electricity_icon.png') }}" class="battery-img" id="bat-5" alt="전력">
+                                <img src="{{ url_for('static', filename='images/hateslop/electricity_icon.png') }}" class="battery-img" id="bat-4" alt="전력">
+                                <img src="{{ url_for('static', filename='images/hateslop/electricity_icon.png') }}" class="battery-img" id="bat-3" alt="전력">
+                                <img src="{{ url_for('static', filename='images/hateslop/electricity_icon.png') }}" class="battery-img" id="bat-2" alt="전력">
+                                <img src="{{ url_for('static', filename='images/hateslop/electricity_icon.png') }}" class="battery-img" id="bat-1" alt="전력">
+                            </div>
+                        </div>
+
+                        <div class="ui-img-box menu-btn" id="btn-clue">
+                            <img src="{{ url_for('static', filename='images/hateslop/pico_chat_start_clue_note.png') }}" alt="단서 노트">
+                        </div>
+
+                        <div class="ui-img-box recommend-wrapper" id="recommend-list">
+                            <img src="{{ url_for('static', filename='images/hateslop/pico_chat_start_recommended_qs.png') }}" alt="추천 질문">
+                            <div class="recommend-text-list" style="display: none;">
+                                <ul>
+                                    <li>- 나는 너에게 뭘 자주 물었어?</li>
+                                    <li>- 나와의 대화 기록을 보여줘.</li>
+                                    <li>- 너는 나를 어떤 사용자로 기억해?</li>
+                                    <li>- 내가 특히 잘한 건 뭐야?</li>
+                                    <li>- 나는 주로 어떤 공간에 있었어?</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <button class="menu-btn btn-yellow">◎ 단서 노트</button>
-            <button class="menu-btn btn-white">✴ 추천 질문</button>
+            <div id="center-display-wrapper" class="normal-layout">
+                <img src="{{ url_for('static', filename='images/hateslop/pico.png') }}" alt="피코" class="character-pico pico-normal" id="pico-avatar">
+                
+                <div id="standard-chat-area" class="chat-text-container">
+                    <div id="chat-history" class="chat-history-text"></div>
+                    <img src="{{ url_for('static', filename='images/hateslop/chat_skip_button.png') }}" id="next-arrow-btn" class="next-arrow" alt="다음 대사">
+                </div>
 
-            <!-- 추천 질문 리스트 -->
-            <div class="glass-panel recommend-box" id="recommend-list">
-                <p style="margin-bottom: 10px; color: #8ab4f8;">[시스템 권장 질문]</p>
-                <p style="cursor: pointer; margin-bottom: 8px;">> 나는 너에게 뭘 자주 물었어?</p>
-                <p style="cursor: pointer; margin-bottom: 8px;">> 너는 나를 어떤 사용자로 기억해?</p>
-                <p style="cursor: pointer;">> 내가 특히 잘한 건 뭐야?</p>
+                <div id="briefing-area" class="briefing-wrapper" style="display: none;">
+                    <div class="briefing-box" style="background-image: url('{{ url_for('static', filename='images/hateslop/briefing_frame_box.png') }}');">
+                        <div id="briefing-history" class="briefing-text"></div>
+                    </div>
+                    <div class="briefing-arrow-area">
+                        <img src="{{ url_for('static', filename='images/hateslop/chat_skip_button.png') }}" id="briefing-next-btn" class="next-arrow" alt="다음 대사" style="visibility: hidden;">
+                    </div>
+                </div>
+
+                <div id="auth-panel" class="auth-panel-container" style="display: none;">
+                    <img src="{{ url_for('static', filename='images/hateslop/security_display.png') }}" class="auth-image" alt="보안 인증">
+                </div>
+
+                <div id="mission-file-area" class="briefing-wrapper" style="display: none;">
+                    <img src="{{ url_for('static', filename='images/hateslop/mission_file.png') }}" class="mission-file-image" alt="미션 파일">
+                    <div class="briefing-arrow-area">
+                        <img src="{{ url_for('static', filename='images/hateslop/chat_skip_button.png') }}" id="mission-next-btn" class="next-arrow" alt="다음 대사" style="visibility: hidden;">
+                    </div>
+                </div>
+
+                <div id="chat-record-area" class="briefing-wrapper" style="display: none;">
+                    <img src="" id="chat-record-img" class="chat-record-image" alt="대화 기록">
+                    <div class="briefing-arrow-area">
+                        <img src="{{ url_for('static', filename='images/hateslop/chat_skip_button.png') }}" id="record-next-btn" class="next-arrow" alt="다음 대사" style="visibility: hidden;">
+                    </div>
+                </div>
+
+                <div id="role-auth-area" class="auth-panel-container" style="display: none; flex-direction: column; align-items: center;">
+                    <img src="{{ url_for('static', filename='images/hateslop/security_display.png') }}" id="role-auth-img" class="auth-image" alt="역할 인증">
+                    <div class="briefing-arrow-area">
+                        <img src="{{ url_for('static', filename='images/hateslop/chat_skip_button.png') }}" id="role-auth-next-btn" class="next-arrow" alt="다음 대사" style="visibility: hidden;">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 중앙 화면 -->
-        <div class="center-screen">
-            <!-- 챗봇 피코 -->
-            <img src="{{ url_for('static', filename='images/pico.png') }}" alt="{{ bot.name }}" class="character-pico" id="pico-avatar">
-            
-            <!-- 대화가 출력될 공간 (임시) -->
-            <div id="chat-history" style="margin-top: 20px; font-family: 'DXTaja'; font-size: 1.3rem; text-align: center; color: #ffeb3b; text-shadow: 0 0 10px rgba(255, 235, 59, 0.5); max-width: 600px; word-break: keep-all;">
-                "안구 움직임 감지, 심박 92. 신체는 정상이군요. 여기가 어디인지 기억나시나요?"
+        <div class="chat-container">
+            <div class="custom-input-wrapper">
+                <img src="{{ url_for('static', filename='images/hateslop/basic_input.png') }}" class="input-bg-img" id="dynamic-input-bg" alt="입력창 배경">
+                <div class="input-content">
+                    <input type="text" id="user-input" autocomplete="off">
+                    <img src="{{ url_for('static', filename='images/hateslop/user_input_button.png') }}" id="send-btn" class="send-img-btn" alt="전송">
+                </div>
             </div>
         </div>
-
     </div>
+    <!-- [피코 대화 시작] -->
 
-    <!-- 하단 채팅 입력창 -->
-    <div class="chat-container">
-        <div class="chat-input-wrapper">
-            <span style="font-size: 1.5rem; color: #888; margin-right: 10px;">✴</span>
-            <input type="text" id="user-input" placeholder="피코에게 질문 입력..." autocomplete="off">
-            <button id="send-btn" class="send-btn">↑</button>
-        </div>
-    </div>
+    <div id="video-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 9999;">
+        <video id="ending-video" style="width: 100%; height: 100%; object-fit: cover;">
+            <!-- src는 자바스크립트가 자동으로 넣어줄 것이므로 비워둡니다 -->
+            <source src="" type="video/mp4">
+        </video>
+    </div> <!-- 비디오 -->
+     
 
     <script>
         // 전송 버튼 누르면 질문 횟수(배터리) 깎이는 간단한 테스트 스크립트
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const chatHistory = document.getElementById('chat-history');
+        
         let power = 5;
 
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
+
+            // 삭제
+            if (message === '/정답') {
+            userInput.value = '';
+            triggerPhaseTransition();
+            return;
+            }
+            // 삭제
 
             if (power <= 0) {
                 typeMessage("전력이 모두 소모되었습니다. 더 이상 질문할 수 없습니다.", false);
@@ -307,15 +788,1154 @@
             }
         });
 
-        const recommendItems = document.querySelectorAll('#recommend-list p');
-        recommendItems.forEach((item, index) => {
-            if (index > 0) {
-                item.addEventListener('click', () => {
-                    userInput.value = item.textContent.replace('> ', '');
-                    userInput.focus();
+        const recommendItems = document.querySelectorAll('.recommend-text-list li');
+
+        recommendItems.forEach((item) => {
+            item.addEventListener('click', () => {
+                // 기존의 '> ' 대신 이번엔 '- ' 기호를 잘라내도록 수정
+                userInput.value = item.textContent.replace('- ', '').trim();
+                userInput.focus();
+            });
+        });
+        const picoAvatar = document.getElementById('pico-avatar');
+        const hologramScreen = document.getElementById('hologram-screen');
+
+        // 🌟 페이즈 전환 연출 함수
+        function triggerPhaseTransition() {
+            // 1. 피코 퇴장 애니메이션 실행
+            picoAvatar.classList.add('fade-out');
+            
+            // 2. 1초 뒤 (피코가 완전히 사라진 후) 홀로그램 등장
+            setTimeout(() => {
+                picoAvatar.style.display = 'none'; // DOM에서 완전히 숨김
+                hologramScreen.classList.add('fade-in'); // 홀로그램 띄우기
+                
+                // 시스템 메시지 타자기로 출력
+                typeMessage("[시스템 알림] 1차 인증 완료. 조종실 출입 잠금이 해제됩니다.", false);
+                
+                // 텍스트 색상을 시스템 알림 느낌의 파란색으로 변경
+                chatHistory.style.color = "#4a90e2";
+                chatHistory.style.textShadow = "0 0 10px rgba(74, 144, 226, 0.5)";
+            }, 1000);
+        }
+    </script>
+    <script>
+        const scenes = [
+            {
+                id: 0,
+                text: "\"안구 움직임 감지, 심박 92, 산소포화도 정상. 신체는 정상이군요. 여기가 어디인지 기억나시나요? 이름이 뭔지 기억하나요?\"",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                showRecommendText: false,
+                isBriefing: false, // 일반 대화 모드
+                inputBgImage: "images/hateslop/basic_input.png"
+            },
+            {
+                id: 1,
+                text: "\"아니다. 우선 현재 상황이 어떤지 알려드리는게 우선 같군요.\"",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                showRecommendText: false,
+                isBriefing: false,
+                inputBgImage: "images/hateslop/basic_input.png"
+            },
+            {
+                id: 2,
+                text: "\"현재 상황을 브리핑해드릴까요? 준비되면 대답해주세요\"",
+                showArrow: true, // 테스트를 위해 다음 화살표 켜둠 (나중에 false로 변경 가능)
+                showPico: true,
+                showHologram: false,
+                showRecommendText: false,
+                isBriefing: false,
+                inputBgImage: "images/hateslop/user_input.png"
+            },
+            {
+                id: 3,
+                text: "[현재 상황 브리핑]\n\n프로젝트 마무리 이후 귀환 중 소행성 충돌로 인한 사고 발생.\n\n선체 파손 제한적이나 출력 정지.\n\n시동 시스템 잠금 이후 자동 표류 중.\n\n선체 탑승 중인 승무원 3명 중 1명. 3명 중 2명 선외활동 중 통신 두절.\n\n귀환 엔진을 재가동하려면 조종실에 들어가야 합니다.\n\n조종실로 가볼까요?",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                showRecommendText: false,
+                isBriefing: true, // 브리핑 모드 ON
+                inputBgImage: "images/hateslop/user_input.png"
+            },
+            {
+                id: 4,
+                text: "",
+                showArrow: false,
+                showPico: false,
+                showHologram: true,
+                isBriefing: false,
+                showRecommendText: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 5,
+                text: "오, 아주 인간적인 문제가 발생했군요.\n본인의 역할조차 기억하지 못하는 상태입니다.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 6,
+                text: "나쁜 소식: 시동 시스템은 이름을 요구합니다.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 7,
+                text: "좋은 소식: 주변에는 당신이 누구였는지 알려줄 단서가 남아 있습니다. 그리고 가장 중요한 저도 있죠! (하하하)",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 8,
+                text: "흠. 하지만 저는 보안 프로토콜 때문에 당신이 누구인지에 대한 직접적인 정보를 줄 수는 없어요. 알려줬다간 보안 프로그램이 제 전원을 당장 꺼버릴걸요?",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg" 
+            },
+            {
+                id: 9,
+                text: "그래도 제가 줄 수 있는 정보를 최대한 드리도록 하죠.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 10,
+                text: "저에게 질문을 해보시겠어요? 저와 대화하다 보면 기억이 날지도 몰라요.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 11,
+                text: "하지만 공짜로 질문을 받아줄 순 없죠. 크하하 장난이고요. 질문 한 번마다 보조 전력이 소모됩니다. 제 수다에도 전기가 든다는 뜻이죠. 그러니 똑똑하게 질문을 해보세요!",
+                showArrow: false, 
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 12,
+                text: "",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 13,
+                text: "이건 프로젝트 파일이에요. 다행히도 이건 보여드릴 수 있어요! 이제 저에게 물어보고 싶은 건 없나요?",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 14,
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: true,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/corridor_bg.jpg"
+            },
+            {
+                id: 15,
+                text: "",
+                showArrow: false,
+                showPico: false,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/role_input_display.png",
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 16,
+                text: "",
+                showArrow: true,
+                showPico: false,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/role_authentication_success_display.png",
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 17, 
+                text: "",
+                showArrow: true,
+                showPico: false,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/role_authentication_1st_fail.png", 
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg" 
+            },
+            {
+                id: 18,
+                text: "탈출할 생각이 없으신가요? 사고에서 막 깨어난 당신에게 해가 될까봐 지금까지 보여주지 않았던 자료가 있어요. 사고 직전 마지막 대화입니다.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false, // 인증 디스플레이 끄기
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 19,
+                text: "보시겠습니까? 보시고 싶지 않다면 보지 않으셔도 돼요.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 20,
+                text: "",
+                showArrow: true,
+                showPico: false, 
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: true,
+                chatRecordImage: "images/hateslop/last_chat_display.png", 
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 21,
+                text: "이제 다시 한 번 역할을 입력해보세요.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false, // 대화 기록 창 끄기
+                showRoleAuth: false,   // 역할 인증 창 끄기
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 22,
+                text: "",
+                showArrow: true, // 안내를 확인하고 다음(시스템 종료 연출 등)으로 넘어가기 위해 true
+                showPico: false,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true, // 인증 디스플레이 레이아웃 사용
+                roleAuthImage: "images/hateslop/role_authentication_2nd_fail.png", // 역할 인증 실패 이미지로 교체
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 23,
+                text: "당신의 안전을 위해 동면 상태에 돌입하겠습니다.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false, // 인증 창 끄기
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 24, // 2차 인증 성공 디스플레이
+                text: "",
+                showArrow: true, // 화살표를 누르면 성공 영상 재생
+                showPico: false,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/역할 인증-조종실 문_ 역할 인증 성공 시.jpg", 
+                inputBgImage: "images/hateslop/user_input.png",
+                bgImage: "images/hateslop/door_bg.jpg"
+            },
+            {
+                id: 25,
+                text: "와! 드디어 조종실에 들어왔군요! 이게 다 제 덕분인 걸 잊지 마시라고요.\n그런데 문제는…!",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png", 
+                powerBgImage: "images/hateslop/cockpit_left_electric.png", 
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ],
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg"
+            },
+            {
+                id: 26,
+                text: "",
+                showArrow: false, // 이름을 입력해야 하므로 다음 버튼은 잠시 숨깁니다
+                showPico: false,  // 디스플레이에 집중하기 위해 피코는 숨깁니다
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true, // 2차 인증 디스플레이 활성화
+                roleAuthImage: "images/hateslop/name_input_display.png", 
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png", 
+                powerBgImage: "images/hateslop/cockpit_left_electric.png", 
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ],
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg" 
+            },
+            {
+                id: 27,
+                text: "당신의 이름은 아시나요? 이름까지 안다면 참 좋을텐데…\n당신의 이름까지 기억해내야 시동이 걸린다는 뜻이에요.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false, // 인증 디스플레이 숨기고 대화창 표시
+                
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 28,
+                text: "미리 말 못 해서 죄송하긴 하네요… 보안 때문에 어쩔 수 없었답니다.\n제 잘못은 아니죠! 그래도 저와 함께라면 이름을 알아낸 것처럼 역할도 알아낼 수 있을 거예요!",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                
+                // 조종실 테마 UI 유지
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 29,
+                text: "흠 보안 프로토콜에 위배되지 않는 정보만 보여드릴게요.\n이 정보는 단서 노트에서 다시 보실 수 있습니다.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                
+                // 조종실 테마 UI 유지
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 30, 
+                text: "",
+                showArrow: true,
+                showPico: true, 
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true, 
+                roleAuthImage: "images/hateslop/seoyunjae.png", 
+                
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 31, 
+                text: "",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/mateo.png", 
+                
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 32, 
+                text: "",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: true,
+                roleAuthImage: "images/hateslop/martaeng.png", 
+                
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 33,
+                text: "어때요? 기억이 나는 것 같나요?",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 34,
+                text: "전혀 기억이 안 나는 표정이군요. 그래도 알아내야죠.",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            },
+            {
+                id: 35,
+                text: "질문질문",
+                showArrow: true,
+                showPico: true,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: false,
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            }
+        ];
+
+        let currentSceneIndex = 33;
+        let currentBattery = 5;
+        let typingInterval;
+        let questionCount = 0;
+        let currentPhase = "name";
+
+        const centerDisplayWrapper = document.getElementById('center-display-wrapper');
+        const standardChatArea = document.getElementById('standard-chat-area');
+        const briefingArea = document.getElementById('briefing-area');
+        const authPanel = document.getElementById('auth-panel');
+        const chatHistoryObj = document.getElementById('chat-history');
+        const briefingHistoryObj = document.getElementById('briefing-history');
+        const nextArrowBtn = document.getElementById('next-arrow-btn');
+        const briefingNextBtn = document.getElementById('briefing-next-btn');
+        const dynamicInputBg = document.getElementById('dynamic-input-bg');
+        const mainGameUI = document.getElementById('main-game-ui');
+        const recommendTextList = document.querySelector('.recommend-text-list');
+        const missionFileArea = document.getElementById('mission-file-area');
+        const missionNextBtn = document.getElementById('mission-next-btn');
+        const userInputField = document.getElementById('user-input');
+        const chatRecordArea = document.getElementById('chat-record-area');
+        const chatRecordTextObj = document.getElementById('chat-record-text');
+        const recordNextBtn = document.getElementById('record-next-btn');
+        const roleAuthArea = document.getElementById('role-auth-area');
+        const roleAuthImg = document.getElementById('role-auth-img');
+        const roleAuthNextBtn = document.getElementById('role-auth-next-btn');
+        const chatRecordImg = document.getElementById('chat-record-img');
+        const videoOverlay = document.getElementById('video-overlay');
+        const endingVideo = document.getElementById('ending-video');
+        const powerBgImg = document.querySelector('.power-wrapper img');
+        const recommendBgImg = document.querySelector('#recommend-list img');
+        const sidebarMainBg = document.querySelector('.sidebar-panel-img .bg-layer');
+        const chatInputBg = document.getElementById('dynamic-input-bg');
+        const introVideos = [
+            "/static/videos/intro_1.mp4",
+            "/static/videos/intro_2.mp4"
+        ];
+        let currentIntroIndex = 0;
+            
+        function decreaseBattery() {
+            if (currentBattery > 0) {
+                const targetBat = document.getElementById(`bat-${currentBattery}`);
+                if (targetBat) {
+                    targetBat.style.opacity = '0.2'; 
+                }
+                currentBattery--;
+            }
+        }
+
+        const nextSceneLogic = () => {
+            if (currentSceneIndex === 23) {
+                playEndingVideo("ending_fail.mp4", null);
+                return;
+            }
+
+            if (currentSceneIndex === 24) {
+                playSuccessVideo("success_video.mp4", 25);
+                return;
+            }
+
+            if (currentSceneIndex < scenes.length - 1) {
+                if (currentSceneIndex === 33) {
+                    currentSceneIndex++;
+                    renderScene(currentSceneIndex);
+                    return;
+                }
+
+                mainGameUI.style.transition = 'opacity 0.8s ease';
+                mainGameUI.style.opacity = '0';
+                
+                setTimeout(() => {
+                    currentSceneIndex++;
+                    renderScene(currentSceneIndex);
+                    mainGameUI.style.opacity = '1';
+                }, 800);
+            }
+        };
+
+        // 성공 영상 재생 전용 함수
+        function playSuccessVideo(videoFileName, nextIndex) {
+            if (videoOverlay && endingVideo) {
+                videoOverlay.style.display = 'block';
+                endingVideo.src = `/static/videos/${videoFileName}`;
+                endingVideo.play();
+
+                endingVideo.onended = () => {
+                    videoOverlay.style.display = 'none'; // 영상 레이어 숨김
+                    currentSceneIndex = nextIndex; // 인덱스를 25로 변경
+                    renderScene(currentSceneIndex); // 25번 장면 렌더링
+                };
+            }
+        }
+
+        async function fetchAIResponse(userMessage) {
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMessage })
                 });
+                const data = await response.json();
+                return data; 
+            } catch (error) {
+                return { 
+                    answer: "시스템 오류: 통신에 실패했습니다.", 
+                    imageType: "none",
+                    isQuestion: false 
+                };
+            }
+        }
+
+        async function handleUserInput(userMessage) {
+            if (currentPhase === "name" && questionCount >= 5) return;
+            
+            const aiResponse = await fetchAIResponse(userMessage);
+            const answerText = aiResponse.answer;
+            const imageType = aiResponse.imageType; 
+            const isQuestion = aiResponse.isQuestion;
+
+            if (isQuestion) {
+                questionCount++;
+            }
+
+            let isImageMode = false;
+            let imagePath = "";
+
+            if (imageType === "house") {
+                isImageMode = true;
+                imagePath = "images/hateslop/house.png";
+            } else if (imageType === "sns") {
+                isImageMode = true;
+                imagePath = "images/hateslop/sns.png";
+            }
+
+            const nextId = scenes[scenes.length - 1].id + 1;
+
+            const newScene = {
+                id: nextId,
+                text: answerText,
+                showArrow: (currentPhase === "name" && (questionCount === 5 || (questionCount === 3 && isQuestion))) || currentPhase === "job",
+                showPico: !isImageMode,
+                showHologram: false,
+                isBriefing: false,
+                showRecommendText: true,
+                showMissionFile: false,
+                showChatRecord: false,
+                showRoleAuth: isImageMode,
+                roleAuthImage: isImageMode ? imagePath : "",
+                sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                inputBgImage: "images/hateslop/cockpit_input.png",
+                powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                bgImage: "images/hateslop/cockpit_bg.jpg",
+                recommendQuestions: [
+                    "내가 살던 집 사진을 보여줘",
+                    "내 인간관계는 어땠지?",
+                    "내 평소 습관을 알려줘",
+                    "내 취미는 어땠지?",
+                    "최근 SNS 포스트를 보여줘"
+                ]
+            };
+
+            scenes.push(newScene);
+            currentSceneIndex = scenes.length - 1;
+            renderScene(currentSceneIndex);
+
+            if (currentPhase === "name" && questionCount === 3 && isQuestion) {
+                const hintScene1 = {
+                    id: nextId + 1,
+                    text: "전 적막이 참 싫단 말이죠. 평소에 당신이 자주 듣던 음악을 틀어드릴게요.",
+                    showArrow: true,
+                    showPico: true,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: false,
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: newScene.recommendQuestions
+                };
+
+                const hintScene2 = {
+                    id: nextId + 2,
+                    text: "어때요? 조금 도움이 되죠! 이 흐름을 타서 빨리 다음 질문을 던져보세요!",
+                    showArrow: false,
+                    showPico: false,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: true,
+                    roleAuthImage: "images/hateslop/album_hint.png",
+                    playAudio: "audios/hateslop/kpop_hint.mp3",
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: newScene.recommendQuestions
+                };
+
+                scenes.push(hintScene1, hintScene2);
+            }
+
+            if (currentPhase === "name" && questionCount === 5 && isQuestion) {
+                let lastId = scenes[scenes.length - 1].id;
+
+                const exhaustScene1 = {
+                    id: lastId + 1,
+                    text: "이름을 맞추기 위해 할당된 전력이 모두 소모되었어요.\n더 이상 질문을 받을 수 없게 되었습니다.",
+                    showArrow: true,
+                    showPico: true,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: false,
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: newScene.recommendQuestions
+                };
+
+                const exhaustScene2 = {
+                    id: lastId + 2,
+                    text: "당신의 안전한 귀환을 위해서니까 이해해주실 거라 믿어요.",
+                    showArrow: true,
+                    showPico: true,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: false,
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: newScene.recommendQuestions
+                };
+
+                const exhaustScene3 = {
+                    id: lastId + 3,
+                    text: "자 이제 시동을 걸어볼 시간이에요.\n당신의 이름을 말할 준비는 되었겠죠?",
+                    showArrow: true,
+                    showPico: true,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: false,
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: newScene.recommendQuestions
+                };
+
+                const exhaustScene4 = {
+                    id: lastId + 4,
+                    text: "",
+                    showArrow: false,
+                    showPico: false,
+                    showHologram: false,
+                    isBriefing: false,
+                    showRecommendText: true,
+                    showMissionFile: false,
+                    showChatRecord: false,
+                    showRoleAuth: true,
+                    roleAuthImage: "images/hateslop/name_input_display.png", 
+                    sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                    inputBgImage: "images/hateslop/cockpit_input.png",
+                    powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    bgImage: "images/hateslop/cockpit_bg.jpg",
+                    recommendQuestions: [] 
+                };
+
+                scenes.push(exhaustScene1, exhaustScene2, exhaustScene3, exhaustScene4);
+            }
+        }
+        
+        function renderScene(index) {
+            const scene = scenes[index];
+            
+            // [안전장치] 해당 인덱스에 장면 데이터가 없으면 실행 중단 (콘솔 에러 방지)
+            if (!scene) {
+                console.error(`장면을 찾을 수 없습니다: 인덱스 ${index}`);
+                return;
+            }
+
+            clearInterval(typingInterval);
+
+            // 배경 및 입력창 배경 업데이트
+            document.body.style.backgroundImage = `url('/static/${scene.bgImage}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            dynamicInputBg.src = `/static/${scene.inputBgImage}`;
+
+            if (sidebarMainBg && scene.sidebarMainBgImage) {
+                sidebarMainBg.src = `/static/${scene.sidebarMainBgImage}`;
+            }
+
+            if (chatInputBg && scene.inputBgImage) {
+                chatInputBg.src = `/static/${scene.inputBgImage}`;
+            }
+            
+            if (powerBgImg && scene.powerBgImage) {
+                powerBgImg.src = `/static/${scene.powerBgImage}`;
+            }
+            
+            if (recommendBgImg && scene.recommendBgImage) {
+                recommendBgImg.src = `/static/${scene.recommendBgImage}`;
+            }
+            
+            // 모든 주요 영역의 표시 여부를 장면 설정에 맞춰 일괄 업데이트
+            picoAvatar.style.display = scene.showPico ? 'block' : 'none';
+            if (authPanel) authPanel.style.display = scene.showHologram ? 'flex' : 'none';
+            if (missionFileArea) missionFileArea.style.display = scene.showMissionFile ? 'flex' : 'none';
+            if (chatRecordArea) chatRecordArea.style.display = scene.showChatRecord ? 'flex' : 'none';
+            if (roleAuthArea) roleAuthArea.style.display = scene.showRoleAuth ? 'flex' : 'none';
+            
+            if (recommendTextList) {
+                recommendTextList.style.display = scene.showRecommendText ? 'block' : 'none';
+                
+                if (scene.showRecommendText && scene.recommendQuestions) {
+                    const listUl = recommendTextList.querySelector('ul');
+                    if (listUl) {
+                        // 1. 기존 리스트 비우기
+                        listUl.innerHTML = "";
+                        // 2. 새로운 질문들 추가하기
+                        scene.recommendQuestions.forEach(q => {
+                            const li = document.createElement('li');
+                            li.textContent = `- ${q}`;
+                            
+                            // 3. (중요) 새로 만든 리스트 아이템에도 클릭 이벤트 다시 걸기
+                            li.addEventListener('click', () => {
+                                if (userInputField) {
+                                    userInputField.value = q;
+                                }
+                            });
+                            
+                            listUl.appendChild(li);
+                        });
+                    }
+                }
+            }
+
+            let targetTextObj;
+            let targetArrowBtn;
+
+            // --- 레이아웃 분기 처리 ---
+
+            // 1. 대화 기록 화면 (14번, 20번 장면 등)
+            if (scene.showChatRecord) {
+                if (chatRecordImg && scene.chatRecordImage) {
+                    chatRecordImg.src = `/static/${scene.chatRecordImage}`;
+                }
+                centerDisplayWrapper.className = 'briefing-layout';
+                standardChatArea.style.display = 'none';
+                briefingArea.style.display = 'none';
+                if (missionFileArea) missionFileArea.style.display = 'none';
+                if (roleAuthArea) roleAuthArea.style.display = 'none'; // 역할 인증창 숨김
+                
+                recordNextBtn.style.visibility = scene.showArrow ? 'visible' : 'hidden';
+                return; 
+            } 
+            
+            // 2. 역할 인증 화면 (15, 16, 17번 장면 등)
+            else if (scene.showRoleAuth) {
+                if (roleAuthImg && scene.roleAuthImage) {
+                    roleAuthImg.src = `/static/${scene.roleAuthImage}`;
+                }
+                centerDisplayWrapper.className = 'normal-layout';
+                standardChatArea.style.display = 'none';
+                briefingArea.style.display = 'none';
+                if (missionFileArea) missionFileArea.style.display = 'none';
+                if (chatRecordArea) chatRecordArea.style.display = 'none'; // 대화 기록창 숨김
+                
+                if (scene.showPico) {
+                    picoAvatar.className = 'character-pico pico-small';
+                    picoAvatar.style.position = 'absolute';
+                    picoAvatar.style.left = '25%'; // 왼쪽 여백 (화면에 맞게 숫자 조절 가능)
+                    picoAvatar.style.top = '60%';  // 위쪽 여백 (숫자가 클수록 아래로 내려감)
+                    picoAvatar.style.transform = 'translateY(-50%)';
+                } else {
+                    // 피코를 숨겨야 할 때는 위치 설정 초기화
+                    picoAvatar.style.position = '';
+                    picoAvatar.style.left = '';
+                    picoAvatar.style.top = '';
+                    picoAvatar.style.transform = '';
+                }
+
+                if (scene.showArrow && roleAuthNextBtn) {
+                    roleAuthNextBtn.style.visibility = 'visible';
+                } else if (roleAuthNextBtn) {
+                    roleAuthNextBtn.style.visibility = 'hidden';
+                }
+                return;
+            } 
+
+            // 3. 미션 파일 화면
+            else if (scene.showMissionFile) {
+                centerDisplayWrapper.className = 'briefing-layout';
+                standardChatArea.style.display = 'none';
+                briefingArea.style.display = 'none';
+                missionNextBtn.style.visibility = scene.showArrow ? 'visible' : 'hidden';
+                return; 
+            } 
+
+            // 4. 브리핑 화면
+            else if (scene.isBriefing) {
+                centerDisplayWrapper.className = 'briefing-layout';
+                picoAvatar.className = 'character-pico pico-small';
+                standardChatArea.style.display = 'none';
+                briefingArea.style.display = 'flex';
+                targetTextObj = briefingHistoryObj;
+                targetArrowBtn = briefingNextBtn;
+            } 
+            
+            // 5. 일반 대화 화면 (피코 중앙)
+            else {
+                centerDisplayWrapper.className = 'normal-layout';
+                picoAvatar.className = 'character-pico pico-normal';
+                standardChatArea.style.display = 'flex';
+                briefingArea.style.display = 'none';
+                targetTextObj = chatHistoryObj;
+                targetArrowBtn = nextArrowBtn;
+            }
+
+            if (scene.playAudio) {
+                const audio = new Audio(`/static/${scene.playAudio}`);
+                audio.play();
+            }
+
+            // 텍스트 타이핑 로직
+            targetTextObj.textContent = ""; 
+            targetArrowBtn.style.visibility = 'hidden';
+
+            let charIndex = 0;
+            typingInterval = setInterval(() => {
+                if (charIndex < scene.text.length) {
+                    targetTextObj.textContent += scene.text[charIndex];
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                    if (scene.showArrow) {
+                        targetArrowBtn.style.visibility = 'visible';
+                    }
+                }
+            }, 40);
+        }
+
+        function playIntroSequence() {
+            // 게임 UI는 숨기고 영상 레이어만 보이게 설정
+            mainGameUI.style.display = 'none';
+            videoOverlay.style.display = 'block';
+
+            // 첫 번째 영상 로드 및 재생
+            endingVideo.src = introVideos[currentIntroIndex];
+            endingVideo.play();
+
+            // 영상이 끝날 때마다 실행되는 이벤트 리스너
+            endingVideo.onended = () => {
+                currentIntroIndex++;
+
+                if (currentIntroIndex < introVideos.length) {
+                    // 다음 인트로 영상이 있으면 재생
+                    endingVideo.src = introVideos[currentIntroIndex];
+                    endingVideo.play();
+                } else {
+                    // 모든 영상이 끝나면 영상 레이어 숨기고 게임 시작
+                    videoOverlay.style.display = 'none';
+                    mainGameUI.style.display = 'block';
+                    renderScene(0); // 0번 장면(프롤로그) 호출
+                }
+            };
+        }
+
+        if (recordNextBtn) recordNextBtn.addEventListener('click', nextSceneLogic);
+        if (nextArrowBtn) nextArrowBtn.addEventListener('click', nextSceneLogic);
+        if (briefingNextBtn) briefingNextBtn.addEventListener('click', nextSceneLogic);
+        if (missionNextBtn) missionNextBtn.addEventListener('click', nextSceneLogic);
+        if (roleAuthNextBtn) roleAuthNextBtn.addEventListener('click', nextSceneLogic);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // detail.html의 기존 페이드인 효과 안에 유지
+            const fadeOverlay = document.getElementById('fade-overlay');
+            if (fadeOverlay) {
+                setTimeout(() => { fadeOverlay.style.opacity = '0'; }, 100);
+                setTimeout(() => { renderScene(currentSceneIndex); }, 1100);
+            } else {
+                playIntroSequence();
             }
         });
+
+        if (recommendItems.length > 0 && userInputField) {
+            recommendItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    let questionText = item.textContent.trim();
+                    
+                    if (questionText.startsWith('- ')) {
+                        questionText = questionText.substring(2);
+                    }
+                    
+                    userInputField.value = questionText;
+                    userInputField.focus();
+                });
+            });
+        }
+
+        mainGameUI.style.display = 'block'; // 숨겨져 있던 전체 UI를 강제로 보여줌!
+        renderScene(currentSceneIndex);     // 화면 렌더링 시작!
     </script>
 </body>
 </html>

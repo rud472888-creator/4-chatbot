@@ -52,35 +52,84 @@
         word-break: keep-all;
       }
       .start-btn {
-        display: inline-block;
-        padding: 15px 50px;
-        color: #050814;
-        background: #ff3333;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 1.3rem;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+          position: relative;
+          z-index: 2;
+          width: 150px;
+          margin-top: 80vh;
+          cursor: pointer;
+          transition: transform 0.2s ease, filter 0.2s ease;
+          background: transparent;
+          border: none;
+          padding: 0;
+          outline: none;
       }
+
       .start-btn:hover {
-        background: #ff6666;
-        box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
-        transform: scale(1.05);
+          transform: scale(1.05);
+          filter: brightness(1.2);
+      }
+
+      body {
+          margin: 0;
+          background-color: #000;
+          overflow: hidden; /* 스크롤바 방지 */
+      }
+
+      .start-screen-container {
+          position: relative;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+
+      .start-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          z-index: 1;
+      }
+
+      .start-btn {
+          position: relative;
+          z-index: 2;
+          margin-top: 15%;
+          cursor: pointer;
+          transition: transform 0.2s ease, filter 0.2s ease;
+      }
+
+      .start-btn:hover {
+          transform: scale(1.05);
+          filter: brightness(1.2);
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1 class="title">PROJECT ARIADNE</h1>
-      <div class="intro-text">
-        당신은 우주 한가운데에 있습니다.<br>
-        그러나 기억이 아무것도 나지 않습니다. 이름도, 이곳에 온 이유도, 함께 있던 사람들의 얼굴도 떠오르지 않습니다.<br><br>
-        다만 한 가지는 분명합니다.<br>
-        집으로 돌아가야 합니다. 그 집조차 기억이 나지 않지만요.
-      </div>
-      <a href="{{ url_for('detail') }}" class="start-btn">시스템 접속</a>
+    <div class="start-screen-container">
+        <img src="{{ url_for('static', filename='images/hateslop/start_bg.png') }}" class="start-bg" alt="배경">
+        <img src="{{ url_for('static', filename='images/hateslop/start_start_button.png') }}" id="start-btn" class="start-btn" alt="START">
     </div>
+    <script>
+        const startBtn = document.getElementById('start-btn');
+
+    startBtn.addEventListener('click', () => {
+        // 1. body 전체를 부드럽게 까만색으로 페이드 아웃
+        document.body.style.transition = 'background-color 1s ease, opacity 1s ease';
+        document.body.style.backgroundColor = '#000'; // 배경을 먼저 까맣게
+        
+        // start-screen-container 전체를 투명하게
+        document.querySelector('.start-screen-container').style.transition = 'opacity 1s ease';
+        document.querySelector('.start-screen-container').style.opacity = '0';
+        
+        // 2. 1초 뒤에(효과가 끝난 후) 페이지 이동
+        setTimeout(() => {
+            window.location.href = '/detail'; 
+        }, 1000); 
+    });
+    </script>
   </body>
 </html>
