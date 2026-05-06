@@ -1416,6 +1416,7 @@
         let typingInterval;
         let questionCount = 0;
         let currentPhase = "name";
+        let nameFailCount = 0;
 
         const centerDisplayWrapper = document.getElementById('center-display-wrapper');
         const standardChatArea = document.getElementById('standard-chat-area');
@@ -1461,23 +1462,19 @@
         }
 
         const nextSceneLogic = () => {
-            if (currentSceneIndex === 23) {
-                playEndingVideo("ending_fail.mp4", null);
+            const currentScene = scenes[currentSceneIndex];
+
+            if (currentScene.triggerEnding) {
+                playSuccessVideo("success_video.mp4", null);
                 return;
             }
 
-            if (currentSceneIndex === 24) {
-                playSuccessVideo("success_video.mp4", 25);
+            if (currentScene.triggerFailEnding) {
+                playEndingVideo("ending_fail.mp4", null); 
                 return;
             }
 
             if (currentSceneIndex < scenes.length - 1) {
-                if (currentSceneIndex === 33) {
-                    currentSceneIndex++;
-                    renderScene(currentSceneIndex);
-                    return;
-                }
-
                 mainGameUI.style.transition = 'opacity 0.8s ease';
                 mainGameUI.style.opacity = '0';
                 
@@ -1517,18 +1514,244 @@
                 return { 
                     answer: "시스템 오류: 통신에 실패했습니다.", 
                     imageType: "none",
-                    isQuestion: false 
+                    isQuestion: false,
+                    isNameAttempt: false,
+                    isNameCorrect: false
                 };
             }
         }
 
         async function handleUserInput(userMessage) {
-            if (currentPhase === "name" && questionCount >= 5) return;
-            
             const aiResponse = await fetchAIResponse(userMessage);
             const answerText = aiResponse.answer;
             const imageType = aiResponse.imageType; 
             const isQuestion = aiResponse.isQuestion;
+            const isNameAttempt = aiResponse.isNameAttempt; 
+            const isNameCorrect = aiResponse.isNameCorrect; 
+
+            const nextId = scenes[scenes.length - 1].id + 1;
+
+            if (isNameAttempt) {
+                if (isNameCorrect) {
+                    const successScene = {
+                        id: nextId,
+                        text: "",
+                        showArrow: true,
+                        showPico: false,
+                        showHologram: false,
+                        isBriefing: false,
+                        showRecommendText: true,
+                        showMissionFile: false,
+                        showChatRecord: false,
+                        showRoleAuth: true,
+                        roleAuthImage: "images/hateslop/name_authentication_success.png", 
+                        sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                        inputBgImage: "images/hateslop/cockpit_input.png",
+                        powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                        recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                        bgImage: "images/hateslop/cockpit_bg.jpg",
+                        recommendQuestions: [],
+                        triggerEnding: true
+                    };
+                    scenes.push(successScene);
+                    currentSceneIndex = scenes.length - 1;
+                    renderScene(currentSceneIndex);
+                } else {
+                    nameFailCount++; 
+                    
+                    if (nameFailCount === 1) {
+                        const failScene = {
+                            id: nextId,
+                            text: "",
+                            showArrow: true,
+                            showPico: false,
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: true,
+                            roleAuthImage: "images/hateslop/name_1st_fail.png",
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: [] 
+                        };
+                        
+                        const failFollowUp1 = {
+                            id: nextId + 1,
+                            text: "여기서 살고 싶으시면 말씀해주세요. 제가 전력이 떨어질 때까지는 함께 해드릴게요.",
+                            showArrow: true,
+                            showPico: true,
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: false,
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        const failFollowUp2 = {
+                            id: nextId + 2,
+                            text: "하지만 제가 누굽니까! 이 피코가 보안 프로토콜을 우회할 수 있는 방법을 찾아냈어요!\n마지막으로 당신의 소지품을 한 번 봐보시겠어요?",
+                            showArrow: true,
+                            showPico: true,
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: false,
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        const failFollowUp3 = {
+                            id: nextId + 3,
+                            text: "",
+                            showArrow: true,
+                            showPico: true,
+                            picoPosition: "bottom-left",
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: true,
+                            roleAuthImage: "images/hateslop/props.png", 
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        const failFollowUp4 = {
+                            id: nextId + 4,
+                            text: "와우 엄청 덜렁거리시는 분이군요? 깨끗한 물건이 없네요!",
+                            showArrow: true,
+                            showPico: true,
+                            picoPosition: "center", // 💡 피코 위치를 다시 중앙으로 복귀
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: false, // 소지품 이미지를 치우기 위해 false
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        const failFollowUp5 = {
+                            id: nextId + 5,
+                            text: "자 이제 다시 이름을 입력해볼 시간이에요.\n이제는 진짜 준비가 되었겠죠?",
+                            showArrow: true,
+                            showPico: true,
+                            picoPosition: "center",
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: false,
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+                        
+                        const failFollowUp6 = {
+                            id: nextId + 6,
+                            text: "",
+                            showArrow: false, 
+                            showPico: false, // 피코 숨김
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: true, // 디스플레이 켜기
+                            roleAuthImage: "images/hateslop/name_1st_fail.png", 
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        // 기존 4개에서 새로운 3장면(4, 5, 6)을 추가해 총 7개의 장면을 푸시합니다.
+                        scenes.push(failScene, failFollowUp1, failFollowUp2, failFollowUp3, failFollowUp4, failFollowUp5, failFollowUp6);
+                        currentSceneIndex = scenes.length - 7; 
+                        renderScene(currentSceneIndex);
+                    } else if (nameFailCount === 2) {
+                        const finalFailScene = {
+                            id: nextId,
+                            text: "",
+                            showArrow: true, 
+                            showPico: false,
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: true,
+                            roleAuthImage: "images/hateslop/name_2nd_fail.png", 
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: []
+                        };
+
+                        const hibernationScene = {
+                            id: nextId + 1,
+                            text: "당신의 안전을 위해 동면 상태에 돌입하겠습니다.",
+                            showArrow: true,
+                            showPico: true,
+                            picoPosition: "center",
+                            showHologram: false,
+                            isBriefing: false,
+                            showRecommendText: true,
+                            showMissionFile: false,
+                            showChatRecord: false,
+                            showRoleAuth: false,
+                            sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
+                            inputBgImage: "images/hateslop/cockpit_input.png",
+                            powerBgImage: "images/hateslop/cockpit_left_electric.png",
+                            recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
+                            bgImage: "images/hateslop/cockpit_bg.jpg",
+                            recommendQuestions: [],
+                            triggerFailEnding: true 
+                        };
+
+                        scenes.push(finalFailScene, hibernationScene);
+                        currentSceneIndex = scenes.length - 2;
+                        renderScene(currentSceneIndex);
+                    }
+                }
+                return; 
+            }
 
             if (isQuestion) {
                 questionCount++;
@@ -1545,8 +1768,6 @@
                 imagePath = "images/hateslop/sns.png";
             }
 
-            const nextId = scenes[scenes.length - 1].id + 1;
-
             const newScene = {
                 id: nextId,
                 text: answerText,
@@ -1562,7 +1783,7 @@
                 sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                 inputBgImage: "images/hateslop/cockpit_input.png",
                 powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                 bgImage: "images/hateslop/cockpit_bg.jpg",
                 recommendQuestions: [
                     "내가 살던 집 사진을 보여줘",
@@ -1592,7 +1813,7 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: newScene.recommendQuestions
                 };
@@ -1613,7 +1834,7 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: newScene.recommendQuestions
                 };
@@ -1638,14 +1859,14 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: newScene.recommendQuestions
                 };
 
                 const exhaustScene2 = {
                     id: lastId + 2,
-                    text: "당신의 안전한 귀환을 위해서니까 이해해주실 거라 믿어요.",
+                    text: "당신의 안전한 귀환을 위해서니까 이해해주실거라 믿어요.",
                     showArrow: true,
                     showPico: true,
                     showHologram: false,
@@ -1657,7 +1878,7 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: newScene.recommendQuestions
                 };
@@ -1676,7 +1897,7 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: newScene.recommendQuestions
                 };
@@ -1696,7 +1917,7 @@
                     sidebarMainBgImage: "images/hateslop/cockpit_box_bg.png",
                     inputBgImage: "images/hateslop/cockpit_input.png",
                     powerBgImage: "images/hateslop/cockpit_left_electric.png",
-                    recommendBgImage: "images/hateslop/cockpit_recommend_qs.png",
+                    recommendBgImage: "images/hateslop/cockpit_recommended_qs.png",
                     bgImage: "images/hateslop/cockpit_bg.jpg",
                     recommendQuestions: [] 
                 };
@@ -1707,6 +1928,18 @@
         
         function renderScene(index) {
             const scene = scenes[index];
+            const picoImageElement = document.getElementById("pico-image"); // (실제 피코 img의 ID나 클래스)
+
+            if (scene.picoPosition === "bottom-left") {
+                picoImageElement.style.transform = "scale(0.7)"; // 크기 약간 줄이기
+                picoImageElement.style.position = "absolute";
+                picoImageElement.style.bottom = "10%";
+                picoImageElement.style.left = "15%"; 
+            } else {
+                // 원래 중앙 자리로 되돌리기 (기본값)
+                picoImageElement.style.transform = "none";
+                picoImageElement.style.position = "static"; // 또는 원래 설정된 값
+            }
             
             // [안전장치] 해당 인덱스에 장면 데이터가 없으면 실행 중단 (콘솔 에러 방지)
             if (!scene) {
