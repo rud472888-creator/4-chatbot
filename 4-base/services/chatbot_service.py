@@ -348,9 +348,9 @@ class ChatbotService:
                     f"소행성 충돌 때문에 우주선이 좀 엉망이 됐는데... "
                     f"그보다 당신, 혹시 자기가 누군지 기억나세요?\n\n"
                     f"아닌 것 같은 표정이네요. 괜찮아요, 제가 도와드릴게요! "
-                    f"시스템 복구를 위해 당신의 직업과 이름을 확인해야 해요.\n\n"
-                    f"먼저 직업부터 알아내 볼까요? "
-                    f"우주선 이곳저곳을 둘러보면 단서를 찾을 수 있을 거예요!"
+                    f"시스템 복구를 위해 당신의 역할과 이름을 확인해야 해요.\n\n"
+                    f"먼저 역할부터 알아내 볼까요? "
+                    f"지금부터의 답변을 잘 조합해 보면 방향이 보일 거예요."
                 )
                 return {"reply": init_reply, "image": None}
 
@@ -476,6 +476,6 @@ if __name__ == "__main__":
     response = service.generate_response("내 방에 뭐가 있어?", "테스터")
     print(f"응답: {response}")
 
-    # 직업 질문 테스트
-    response = service.generate_response("내 직업이 뭐야?", "테스터")
+    # 역할 질문 테스트
+    response = service.generate_response("내 역할이 뭐야?", "테스터")
     print(f"응답: {response}")
