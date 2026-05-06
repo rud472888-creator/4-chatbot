@@ -30,6 +30,7 @@ RAG 기반 검색과 OpenAI LLM을 활용하여 방탈출 추리 게임을 진�
 
 import os
 import json
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -157,6 +158,40 @@ class ChatbotService:
     _conversation_buffer: list = []
     _BUFFER_MAX_SIZE = 10  # 최근 10개 메시지(5회 대화)
 
+    def _normalize_answer(self, text: str) -> str:
+        """정답 입력 비교를 위해 공백과 문장부호를 제거하고 소문자화"""
+        return re.sub(r"[\W_]+", "", text, flags=re.UNICODE).lower()
+
+    def _matches_answer(self, user_message: str, candidates: list[str]) -> bool:
+        normalized_input = self._normalize_answer(user_message)
+        for candidate in candidates:
+            normalized_candidate = self._normalize_answer(candidate)
+            if normalized_candidate and normalized_candidate in normalized_input:
+                return True
+        return False
+
+    def _get_player_profile(self):
+        player_name = self.config.get("player_name", "")
+        profiles = self.config.get("crew_profiles", {})
+        for profile in profiles.values():
+            if profile.get("name") == player_name:
+                return profile
+        return None
+
+    def _is_correct_name(self, user_message: str) -> bool:
+        correct_name = self.config.get("player_name", "")
+        candidates = [correct_name]
+
+        if " " in correct_name:
+            candidates.append(correct_name.split()[0])
+
+        return self._matches_answer(user_message, candidates)
+
+    def _is_correct_job(self, user_message: str) -> bool:
+        player_profile = self._get_player_profile()
+        correct_job = player_profile.get("secret_job", "") if player_profile else ""
+        return self._matches_answer(user_message, [correct_job])
+
     def _save_to_buffer(self, user_message: str, bot_reply: str):
         """대화 기록을 메모리(또는 폴백 버퍼)에 저장"""
         if self.memory is not None:
@@ -244,16 +279,21 @@ class ChatbotService:
         best_doc = None
         best_similarity = 0.0
         best_meta = None
+        ignored_titles = {"사용자가 관련 없는 말을 할 때"}
 
         for doc, dist, meta in zip(
             results["documents"][0],
             results["distances"][0],
             results["metadatas"][0],
         ):
+            title = meta.get("title", "?")
+            if title in ignored_titles:
+                print(f"    [RAG] [{title}] 제외")
+                continue
+
             similarity = 1 / (1 + dist)
 
-            print(f"    [RAG] [{meta.get('title', '?')}] "
-                  f"거리={dist:.4f}  유사도={similarity:.4f}")
+            print(f"    [RAG] [{title}] 거리={dist:.4f}  유사도={similarity:.4f}")
 
             if similarity >= threshold and similarity > best_similarity:
                 best_doc = doc
@@ -268,6 +308,23 @@ class ChatbotService:
     # ================================================================
     # Prompt Building
     # ================================================================
+
+    def _get_player_clue_context(self) -> str:
+        """정답 이름/직업을 제외한 현재 플레이어 단서 정보를 반환"""
+        player_profile = self._get_player_profile()
+        if not player_profile:
+            return ""
+
+        clue_lines = []
+        hidden_keys = {"name", "secret_job"}
+        for key, value in player_profile.items():
+            if key in hidden_keys:
+                continue
+            if isinstance(value, list):
+                value = ", ".join(value)
+            clue_lines.append(f"- {key}: {value}")
+
+        return "\n".join(clue_lines)
 
     def _build_prompt(self, user_message: str, context: str = None, username: str = "사용자"):
         """
@@ -285,6 +342,10 @@ class ChatbotService:
             str: 최종 사용자 프롬프트
         """
         parts = []
+
+        player_context = self._get_player_clue_context()
+        if player_context:
+            parts.append(f"[현재 사용자 단서]\n{player_context}")
 
         # RAG 컨텍스트 (있을 때만)
         if context:
@@ -315,6 +376,20 @@ class ChatbotService:
             rules_text = "\n".join(f"- {rule}" for rule in rules)
             parts.append(f"\n규칙:\n{rules_text}")
 
+        player_profile = self._get_player_profile()
+        if player_profile:
+            hidden_words = [
+                self.config.get("player_name", ""),
+                player_profile.get("secret_job", ""),
+            ]
+            hidden_words = [word for word in hidden_words if word]
+            if hidden_words:
+                parts.append(
+                    "\n일반 답변 금지어:\n"
+                    f"- {', '.join(hidden_words)}\n"
+                    "- 사용자가 인증 화면에 정답을 입력하는 경우가 아니라면 위 단어를 직접 출력하지 마."
+                )
+
         return "\n".join(parts)
 
     # ================================================================
@@ -341,14 +416,28 @@ class ChatbotService:
             # ──────────────────────────────────────────────
             # [0단계] 이름 인증 페이즈 처리
             # ──────────────────────────────────────────────
+            if phase == "job":
+                is_correct = self._is_correct_job(user_message)
+                reply = "역할 인증 성공." if is_correct else "역할 인증 실패."
+                return {
+                    "reply": reply, "answer": reply,
+                    "image": None, "imageType": "none",
+                    "isQuestion": False,
+                    "isJobAttempt": True,
+                    "isJobCorrect": is_correct,
+                    "isNameAttempt": False,
+                    "isNameCorrect": False,
+                }
+
             if phase == "name":
-                correct_name = self.config.get("player_name", "")
-                is_correct = user_message.strip() == correct_name
+                is_correct = self._is_correct_name(user_message)
                 reply = "이름 인증 성공." if is_correct else "이름 인증 실패."
                 return {
                     "reply": reply, "answer": reply,
                     "image": None, "imageType": "none",
                     "isQuestion": False,
+                    "isJobAttempt": False,
+                    "isJobCorrect": False,
                     "isNameAttempt": True,
                     "isNameCorrect": is_correct,
                 }
@@ -372,7 +461,9 @@ class ChatbotService:
                 return {
                     "reply": init_reply, "answer": init_reply,
                     "image": None, "imageType": "none",
-                    "isQuestion": False, "isNameAttempt": False, "isNameCorrect": False,
+                    "isQuestion": False,
+                    "isJobAttempt": False, "isJobCorrect": False,
+                    "isNameAttempt": False, "isNameCorrect": False,
                 }
 
             # ──────────────────────────────────────────────
@@ -417,7 +508,7 @@ class ChatbotService:
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.8,
-                max_tokens=500,
+                max_tokens=220,
             )
 
             reply = response.choices[0].message.content
@@ -449,6 +540,8 @@ class ChatbotService:
                 "image": None,
                 "imageType": image_type,
                 "isQuestion": True,
+                "isJobAttempt": False,
+                "isJobCorrect": False,
                 "isNameAttempt": False,
                 "isNameCorrect": False,
             }
@@ -461,7 +554,9 @@ class ChatbotService:
                 "reply": "삐빅... 시스템에 일시적인 오류가 발생했어요. 다시 한 번 말씀해주시겠어요?",
                 "answer": "삐빅... 시스템에 일시적인 오류가 발생했어요. 다시 한 번 말씀해주시겠어요?",
                 "image": None, "imageType": "none",
-                "isQuestion": False, "isNameAttempt": False, "isNameCorrect": False,
+                "isQuestion": False,
+                "isJobAttempt": False, "isJobCorrect": False,
+                "isNameAttempt": False, "isNameCorrect": False,
             }
 
 

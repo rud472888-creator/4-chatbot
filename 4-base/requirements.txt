@@ -5,6 +5,7 @@ Flask-CORS
 # AI & VectorDB (Core Libraries)
 openai>=1.0.0,<2.0.0
 chromadb==0.4.24
+numpy<2
 
 # LLM Framework
 langchain-core
